@@ -3,6 +3,8 @@
 Sistema web de gestão operacional da **Tóliman Transportes**: motoristas, monitoramento de operações de container, pátio, cadastros, vistoria, lacres, relatórios, HelpDesk e controle de versões.
 
 > As telas deste manual foram capturadas no ambiente de produção. Campos e indicadores aparecem vazios ou zerados quando não havia registros no momento da captura.
+>
+> Pontos ainda não confirmados estão listados em [PERGUNTAS.md](PERGUNTAS.md).
 
 ## Sumário
 
