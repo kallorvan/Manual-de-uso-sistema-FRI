@@ -231,7 +231,13 @@ Cadastro dos tipos de evento que afetam a disponibilidade de motoristas e veícu
 - **Colunas:** Código, Descrição, Tipo (**MOT** = motorista, **VEI** = veículo) e Ações.
 - Exemplos: Atestado Médico, Compromisso, Day Off, Férias, Manutenção (veículo) e Médico.
 
-### 7.6 Tipo Container
+### 7.6 Embalagens
+
+Cadastro das embalagens. Busca por Nome; use o `+` do cabeçalho para incluir uma embalagem.
+
+![Cadastros Operacionais > Embalagens](imagens/18b-cadastros-embalagens.jpg)
+
+### 7.7 Tipo Container
 
 Cadastro dos tipos de container. Busca por Nome; use o `+` do cabeçalho para incluir um tipo.
 
