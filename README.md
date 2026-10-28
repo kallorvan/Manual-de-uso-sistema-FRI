@@ -6,6 +6,29 @@ Sistema web de gestão operacional da **Tóliman Transportes**: motoristas, moni
 >
 > Pontos ainda não confirmados estão listados em [PERGUNTAS.md](PERGUNTAS.md).
 
+## Manual colaborativo (versão compartilhada)
+
+A edição em equipe é feita no **Manual FRI Colaborativo**, uma página publicada no claude.ai. O código dela está em [compartilhado/manual-fri.html](compartilhado/manual-fri.html). As anotações, os prints e o histórico de alterações ficam salvos num banco compartilhado da própria página, e não no navegador de cada pessoa.
+
+- Quem recebe acesso de **Colaborador** edita textos, marcadores e conexões.
+- Quem recebe acesso de **Editor** também adiciona e troca prints.
+- O dono e os Editores conferem cada alteração na aba **Histórico**, podendo marcar como conferida ou desfazer.
+
+O `anotador.html` abaixo continua funcionando, mas salva só no navegador de quem usa.
+
+## Anotador de telas (para o instrutor)
+
+O arquivo [anotador.html](anotador.html) é uma aplicação para o instrutor anotar os prints do sistema: o que cada tela significa e onde ela se conecta. Abra o arquivo no navegador (Chrome ou Edge) a partir desta pasta, para que os prints de `imagens/` apareçam. As telas já vêm com as descrições deste manual.
+
+- **Editar:** clique em um ponto do print para criar um marcador numerado e explicar aquele botão, campo ou indicador. O marcador pode **levar para outra tela**; nesse caso ele fica laranja.
+- **Sobre a tela:** módulo, nome, "O que esta tela significa", dica do instrutor e a marcação **Tela revisada**, que alimenta a barra de progresso.
+- **Onde esta tela se conecta:** conexões com outras telas ("Leva para") e, automaticamente, as telas que apontam para ela ("Chegam aqui").
+- **Apresentar:** mostra como o aluno vai ver. Os números abrem um balão com a explicação e o botão para ir à tela ligada.
+- **Mapa de conexões:** todas as telas agrupadas por módulo, com as ligações entre elas. Clique em uma tela para abri-la.
+- **+ Adicionar prints:** inclui novos prints. Também dá para trocar o print de uma tela.
+- **Arquivo › Gerar manual interativo:** gera um único arquivo HTML, só de leitura, com os prints embutidos, para entregar aos alunos.
+- **Arquivo › Salvar backup / Abrir backup:** as anotações ficam salvas no próprio navegador. Salve um backup em JSON para não perdê-las e para passar o trabalho para outro computador.
+
 ## Sumário
 
 1. [Acesso e tela inicial](#1-acesso-e-tela-inicial)
@@ -25,8 +48,7 @@ Sistema web de gestão operacional da **Tóliman Transportes**: motoristas, moni
 15. [HelpDesk](#15-helpdesk)
 16. [Updates Version](#16-updates-version)
 17. [Console](#17-console)
-18. [Configurações](#18-configurações)
-19. [Problemas conhecidos](#19-problemas-conhecidos)
+18. [Problemas conhecidos](#18-problemas-conhecidos)
 
 ---
 
@@ -218,7 +240,13 @@ Cadastro dos tipos de evento que afetam a disponibilidade de motoristas e veícu
 - **Colunas:** Código, Descrição, Tipo (**MOT** = motorista, **VEI** = veículo) e Ações.
 - Exemplos: Atestado Médico, Compromisso, Day Off, Férias, Manutenção (veículo) e Médico.
 
-### 7.6 Tipo Container
+### 7.6 Embalagens
+
+Cadastro das embalagens. Busca por Nome; use o `+` do cabeçalho para incluir uma embalagem.
+
+![Cadastros Operacionais > Embalagens](imagens/18b-cadastros-embalagens.jpg)
+
+### 7.7 Tipo Container
 
 Cadastro dos tipos de container. Busca por Nome; use o `+` do cabeçalho para incluir um tipo.
 
@@ -381,7 +409,7 @@ Cadastro dos prazos de SLA. Busca por Prioridade; **+ Novo** inclui um SLA.
 
 ### 15.4 Manual
 
-Deveria mostrar o manual do HelpDesk, mas a página retorna erro. Veja [Problemas conhecidos](#19-problemas-conhecidos).
+Deveria mostrar o manual do HelpDesk, mas a página retorna erro. Veja [Problemas conhecidos](#18-problemas-conhecidos).
 
 ![HelpDesk > Manual](imagens/35-helpdesk-manual.jpg)
 
@@ -442,17 +470,11 @@ Console de banco de dados para consulta, exploração de objetos e execução de
 3. Navegue pelos objetos em **Objetos do Banco** (botão **Atualizar** recarrega a lista).
 4. Use **Janela SQL** para executar comandos.
 
-## 18. Configurações
-
-Acessada pelo menu do usuário (canto superior direito). A página retorna erro no momento. Veja [Problemas conhecidos](#19-problemas-conhecidos). Abaixo dela fica o painel **Meus dados**, com o nome e o CPF do usuário.
-
-![Configurações](imagens/44-configuracoes.jpg)
-
-## 19. Problemas conhecidos
+## 18. Problemas conhecidos
 
 | Tela | Erro | Detalhe |
 |---|---|---|
 | HelpDesk > Manual | Server Error — *Parser Error* | O arquivo `manualhelpdesk.aspx.cs` não existe no servidor. |
-| Configurações | Server Error — HTTP 404 *The resource cannot be found* | A página de configurações não foi encontrada no servidor. |
+| Configurações (menu do usuário, no canto superior direito) | Server Error — HTTP 404 *The resource cannot be found* | A página de configurações não foi encontrada no servidor. Por isso a tela não tem seção própria neste manual. |
 
 Essas telas devem ser corrigidas pela equipe de desenvolvimento.

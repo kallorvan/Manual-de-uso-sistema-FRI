@@ -146,12 +146,12 @@ As telas usadas no [manual](README.md) foram capturadas vazias, então não most
 
 > Resposta: _pendente_
 
-**30. Há previsão de corrigir as telas [HelpDesk > Manual e Configurações](README.md#19-problemas-conhecidos)? O que a tela Configurações deveria ter?**
+**30. Há previsão de corrigir as telas [HelpDesk > Manual e Configurações](README.md#18-problemas-conhecidos)? O que a tela Configurações deveria ter?**
 
 > Resposta: _pendente_
 
 ## Dados pessoais
 
-**31. Vamos tampar o CPF, os nomes e as placas que aparecem nos prints?** Aparecem nas telas de Motorista, Disponibilidade de Veículos e Configurações.
+**31. Vamos tampar o CPF, os nomes e as placas que aparecem nos prints?** Aparecem nas telas de Motorista e Disponibilidade de Veículos.
 
 > Resposta: _pendente_

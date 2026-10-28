@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anotador de Telas FRI</title>
+<style>
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+  --border: #dfe3e8;
+  --text: #1f2933;
+  --muted: #5f6b7a;
+  --accent: #1d5fd1;
+  --accent-soft: #e8f0fd;
+  --link: #e07b00;
+  --link-soft: #fff3e0;
+  --danger: #c62828;
+  --ok: #2e7d32;
+  --shadow: 0 1px 3px rgba(16, 24, 40, .08), 0 4px 12px rgba(16, 24, 40, .06);
+  --radius: 8px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+button:hover { background: var(--surface-2); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.primary:hover { filter: brightness(1.08); }
+button.danger { color: var(--danger); }
+button.link-btn { border: 0; background: none; padding: 0; color: var(--accent); text-align: left; }
+button.link-btn:hover { text-decoration: underline; }
+input[type=text], input[type=search], select, textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: var(--surface);
+}
+textarea { resize: vertical; min-height: 70px; }
+label.field { display: block; margin-bottom: 10px; }
+label.field > span { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+.hidden { display: none !important; }
+
+/* Cabeçalho */
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #16325c;
+  color: #fff;
+  flex-wrap: wrap;
+}
+header h1 { font-size: 16px; margin: 0; font-weight: 600; white-space: nowrap; }
+header .spacer { flex: 1; }
+header button { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: #fff; }
+header button:hover { background: rgba(255,255,255,.2); }
+.seg { display: inline-flex; border: 1px solid rgba(255,255,255,.3); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: transparent; }
+.seg button.on { background: #fff; color: #16325c; font-weight: 600; }
+#saveState { font-size: 12px; opacity: .8; min-width: 60px; }
+.menu { position: relative; }
+.menu-list {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 50;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+  min-width: 280px; padding: 4px;
+}
+.menu-list button { display: block; width: 100%; text-align: left; border: 0; background: none; color: var(--text); padding: 8px 10px; }
+.menu-list button:hover { background: var(--surface-2); }
+.menu-list small { display: block; color: var(--muted); }
+
+/* Layout principal */
+.layout { flex: 1; display: flex; min-height: 0; }
+aside.lista {
+  width: 270px; flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; min-height: 0;
+}
+.lista-topo { padding: 10px; border-bottom: 1px solid var(--border); }
+.progresso { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.barra { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; overflow: hidden; }
+.barra > i { display: block; height: 100%; background: var(--ok); }
+#listaTelas { overflow-y: auto; flex: 1; padding: 4px 0 16px; }
+.grupo-titulo { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 700; padding: 10px 12px 4px; }
+.item-tela {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; border: 0; border-radius: 0; background: none; text-align: left;
+  padding: 6px 12px; border-left: 3px solid transparent;
+}
+.item-tela:hover { background: var(--surface-2); }
+.item-tela.ativo { background: var(--accent-soft); border-left-color: var(--accent); }
+.item-tela .nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-tela .contagem { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.item-tela .ok { color: var(--ok); font-weight: 700; width: 12px; }
+
+main { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.barra-tela {
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.barra-tela .caminho { flex: 1; min-width: 0; }
+.barra-tela .caminho small { color: var(--muted); display: block; font-size: 12px; }
+.barra-tela .caminho strong { font-size: 16px; }
+.dica-uso { font-size: 12px; color: var(--muted); padding: 6px 16px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.palco { flex: 1; overflow: auto; padding: 16px; }
+.quadro { position: relative; display: inline-block; max-width: 100%; box-shadow: var(--shadow); background: #fff; line-height: 0; }
+.quadro.ampliado { max-width: none; }
+.quadro.ampliado img { max-width: none; width: 100%; }
+.quadro img { max-width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
+.quadro.editando { cursor: crosshair; }
+.marcador {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: #fff; border: 2px solid #fff;
+  font-size: 13px; font-weight: 700; line-height: 24px; text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.4); cursor: pointer; padding: 0;
+  touch-action: none;
+}
+.marcador.liga { background: var(--link); }
+.marcador.sel { outline: 3px solid #ffd54f; outline-offset: 1px; }
+.marcador:hover { background: var(--accent); filter: brightness(1.12); }
+.marcador.liga:hover { background: var(--link); }
+.balao {
+  position: absolute; z-index: 20; width: 300px; max-width: 80vw;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 12px; line-height: 1.45;
+}
+.balao h4 { margin: 0 0 6px; font-size: 14px; }
+.balao .fechar { position: absolute; top: 6px; right: 8px; border: 0; background: none; font-size: 16px; padding: 2px 6px; }
+.balao .ir { margin-top: 10px; }
+
+/* Painel lateral direito */
+aside.painel {
+  width: 360px; flex-shrink: 0; overflow-y: auto;
+  background: var(--surface); border-left: 1px solid var(--border); padding: 12px 14px 32px;
+}
+.secao { border-bottom: 1px solid var(--border); padding: 10px 0 14px; }
+.secao:last-child { border-bottom: 0; }
+.secao h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+.secao h3 .acao { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 12px; padding: 3px 8px; }
+.texto p { margin: 0 0 8px; }
+.texto ul { margin: 0 0 8px; padding-left: 18px; }
+.vazio { color: var(--muted); font-style: italic; }
+.lista-marc { list-style: none; margin: 0; padding: 0; }
+.lista-marc li { display: flex; gap: 8px; align-items: flex-start; padding: 6px 4px; border-radius: 6px; cursor: pointer; }
+.lista-marc li:hover { background: var(--surface-2); }
+.lista-marc li.sel { background: #fff8e1; }
+.num { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+.num.liga { background: var(--link); }
+.lista-marc .info { min-width: 0; flex: 1; }
+.lista-marc .info small { display: block; color: var(--muted); }
+.editor-marc { background: #fff8e1; border: 1px solid #ffe082; border-radius: var(--radius); padding: 10px; margin-top: 10px; }
+.conexao { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; margin-bottom: 8px; background: var(--surface-2); }
+.conexao .linha { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.conexao .linha select { flex: 1; }
+.conexao textarea { min-height: 48px; }
+.ligacao { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; }
+.ligacao .seta { color: var(--muted); flex-shrink: 0; }
+.ligacao small { display: block; color: var(--muted); }
+.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: var(--link-soft); color: #8a4b00; margin-left: 4px; }
+.legenda { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.legenda span { display: inline-flex; align-items: center; gap: 4px; }
+.legenda i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; background: var(--accent); }
+.legenda i.liga { background: var(--link); }
+.check { display: flex; gap: 6px; align-items: center; margin: 4px 0 10px; }
+.botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Mapa */
+#vistaMapa { flex: 1; overflow: auto; background: var(--bg); position: relative; }
+#vistaMapa .topo-mapa { position: sticky; left: 0; top: 0; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; z-index: 2; }
+#mapaSvg { display: block; }
+#mapaSvg .modulo-box { fill: #fff; stroke: var(--border); }
+#mapaSvg .modulo-nome { font-size: 12px; font-weight: 700; fill: var(--muted); text-transform: uppercase; }
+#mapaSvg .no rect { fill: var(--surface-2); stroke: #c3cad3; rx: 6; }
+#mapaSvg .no text { font-size: 12px; fill: var(--text); pointer-events: none; }
+#mapaSvg .no { cursor: pointer; }
+#mapaSvg .no:hover rect, #mapaSvg .no.foco rect { fill: var(--accent-soft); stroke: var(--accent); }
+#mapaSvg .no.sem rect { stroke-dasharray: 3 3; }
+#mapaSvg .aresta { fill: none; stroke: #7b8a9c; stroke-width: 1.5; opacity: .55; }
+#mapaSvg .aresta.marc { stroke: var(--link); stroke-dasharray: 5 4; }
+#mapaSvg .aresta.foco { opacity: 1; stroke-width: 2.5; }
+#mapaSvg.focando .aresta:not(.foco) { opacity: .08; }
+#mapaSvg.focando .no:not(.foco):not(.vizinho) { opacity: .35; }
+
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: #16325c; color: #fff; padding: 10px 16px; border-radius: var(--radius);
+  box-shadow: var(--shadow); z-index: 100; max-width: 90vw;
+}
+
+/* Somente leitura (manual exportado) */
+body.leitura .so-edicao { display: none !important; }
+
+@media (max-width: 1000px) {
+  .layout { flex-direction: column; overflow-y: auto; }
+  aside.lista { width: auto; max-height: 220px; border-right: 0; border-bottom: 1px solid var(--border); }
+  aside.painel { width: auto; border-left: 0; border-top: 1px solid var(--border); overflow: visible; }
+  main { min-height: 60vh; }
+  .palco { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="tituloApp">Anotador de Telas — Sistema FRI</h1>
+  <div class="seg" role="tablist" aria-label="Visualização">
+    <button id="btVistaTela" class="on">Telas</button>
+    <button id="btVistaMapa">Mapa de conexões</button>
+  </div>
+  <div class="seg so-edicao" aria-label="Modo">
+    <button id="btModoEditar" class="on" title="Clique no print para adicionar marcadores">Editar</button>
+    <button id="btModoApresentar" title="Como o aluno vai ver">Apresentar</button>
+  </div>
+  <span class="spacer"></span>
+  <span id="saveState" class="so-edicao"></span>
+  <button id="btAdicionar" class="so-edicao" title="Adicionar novos prints">+ Adicionar prints</button>
+  <div class="menu so-edicao">
+    <button id="btArquivo">Arquivo ▾</button>
+    <div id="menuArquivo" class="menu-list hidden">
+      <button data-acao="manual">Gerar manual interativo (HTML)<small>Arquivo para os alunos, só leitura.</small></button>
+      <button data-acao="exportar">Salvar backup (JSON)<small>Guarda todas as anotações e prints adicionados.</small></button>
+      <button data-acao="importar">Abrir backup (JSON)<small>Substitui as anotações atuais.</small></button>
+      <button data-acao="restaurar">Restaurar dados iniciais<small>Apaga as anotações e volta ao manual original.</small></button>
+    </div>
+  </div>
+  <input id="inArquivosImg" type="file" accept="image/*" multiple class="hidden">
+  <input id="inTrocarImg" type="file" accept="image/*" class="hidden">
+  <input id="inBackup" type="file" accept="application/json,.json" class="hidden">
+</header>
+
+<div class="layout" id="vistaTela">
+  <aside class="lista">
+    <div class="lista-topo">
+      <input id="busca" type="search" placeholder="Buscar tela…" aria-label="Buscar tela">
+      <div class="progresso so-edicao"><span id="txtProgresso"></span><div class="barra"><i id="barraProgresso"></i></div></div>
+    </div>
+    <nav id="listaTelas"></nav>
+  </aside>
+
+  <main>
+    <div class="barra-tela">
+      <button id="btAnterior" title="Tela anterior (←)">◀</button>
+      <div class="caminho"><small id="cabModulo"></small><strong id="cabTitulo"></strong></div>
+      <select id="zoom" title="Tamanho do print" aria-label="Tamanho do print" style="width:auto">
+        <option value="1">Ajustar</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option>
+      </select>
+      <button id="btProxima" title="Próxima tela (→)">▶</button>
+    </div>
+    <div class="dica-uso" id="dicaUso"></div>
+    <div class="palco" id="palco">
+      <div class="quadro" id="quadro">
+        <img id="imgTela" alt="">
+      </div>
+    </div>
+  </main>
+
+  <aside class="painel" id="painel"></aside>
+</div>
+
+<div id="vistaMapa" class="hidden">
+  <div class="topo-mapa">
+    <strong>Mapa de conexões</strong>
+    <div class="legenda">
+      <span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#7b8a9c" stroke-width="2"/></svg> conexão da tela</span>
+      <span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#e07b00" stroke-width="2" stroke-dasharray="5 4"/></svg> marcador que leva a outra tela</span>
+      <span>Passe o mouse para destacar · clique para abrir</span>
+    </div>
+  </div>
+  <svg id="mapaSvg"></svg>
+</div>
+
+<script>
+const DADOS_INICIAIS = [{"id":"01-tela-inicial","arquivo":"imagens/01-tela-inicial.jpg","modulo":"Geral","titulo":"Tela inicial","descricao":"O sistema é acessado pelo navegador, na rede interna da empresa:\n\nhttp://10.10.0.10:9090/usermanager/login.aspx\n\nInforme seu usuário e senha. Depois do login, abre a tela inicial.\n\n- **Menu lateral (à esquerda):** reúne todos os módulos. Clique em um módulo para abrir as telas dele.\n- **Botão ☰ (ao lado do logo):** recolhe ou expande o menu lateral.\n- **Nome do usuário (canto superior direito):** abre as opções da sua conta, como **Meus dados**.\n\nMódulos do menu: Motorista, Monitoramento, Pátio, Acesso, Cadastros Operacionais, Operacional, Dashboards, Cliente, Integração, Lacres, Relatórios, Auditoria Registros, HelpDesk, Updates Version e Console.","conexoes":[{"destino":"02-motorista-estufagem","texto":"Pelo menu lateral, módulo Motorista."},{"destino":"20-operacional-monitoramento-vistoria","texto":"Pelo menu lateral, módulo Operacional."}],"marcadores":[],"dica":""},{"id":"02-motorista-estufagem","arquivo":"imagens/02-motorista-estufagem.jpg","modulo":"Motorista","titulo":"Estufagem","descricao":"Mostra as estufagens do motorista identificado pelo CPF.\n\n- **CPF Motorista:** preenchido com o CPF do usuário logado.\n- **Local de Estufagem / Cidade de Estufagem:** local e cidade da operação.\n- **Chegada/Saída (botão verde):** registra a chegada ou a saída do motorista no local de estufagem.\n- **Data de Chegada / Data de Saída:** horários registrados.\n- **⟳:** atualiza a lista.","conexoes":[{"destino":"07-monitoramento-estufagem-interior","texto":"A chegada/saída registrada pelo motorista aparece no acompanhamento da Estufagem Interior."}],"marcadores":[],"dica":""},{"id":"03-motorista-container-vazio","arquivo":"imagens/03-motorista-container-vazio.jpg","modulo":"Motorista","titulo":"Container Vazio","descricao":"Lista os containers vazios vinculados ao motorista.\n\n- **CPF Motorista:** identifica o motorista.\n- **⟳:** atualiza a lista.","conexoes":[{"destino":"05-monitoramento-retirada-vazio-motorista","texto":"O container vazio do motorista corresponde às retiradas de vazio acompanhadas no Monitoramento."}],"marcadores":[],"dica":""},{"id":"04-monitoramento-programacao-retirada-vazio","arquivo":"imagens/04-monitoramento-programacao-retirada-vazio.jpg","modulo":"Monitoramento","titulo":"Programação Retirada Vazio","descricao":"Acompanha a programação de retirada de containers vazios e as vistorias ligadas a ela.\n\n- **Filtros:** Booking, Data da Retirada, Data da Estufagem Inicial e Final, A Vistoriar, Em Andamento, Agendado e Verificar e-mail.\n- **Indicadores:** Sem Agendamento, Vistoria a Realizar, Vistorias Realizadas e Total.","conexoes":[{"destino":"05-monitoramento-retirada-vazio-motorista","texto":"A retirada programada aqui é acompanhada por motorista em Retirada Vazio Motorista."},{"destino":"20-operacional-monitoramento-vistoria","texto":"As vistorias ligadas à retirada são tratadas em Monitoramento Vistoria."}],"marcadores":[],"dica":""},{"id":"05-monitoramento-retirada-vazio-motorista","arquivo":"imagens/05-monitoramento-retirada-vazio-motorista.jpg","modulo":"Monitoramento","titulo":"Retirada Vazio Motorista","descricao":"Acompanha as retiradas de vazio por motorista.\n\n- **Filtros:** Booking, Data da Retirada e a situação (**Andamento**, **Finalizada** ou **Todos**).","conexoes":[],"marcadores":[],"dica":""},{"id":"06-monitoramento-programacao-diaria","arquivo":"imagens/06-monitoramento-programacao-diaria.jpg","modulo":"Monitoramento","titulo":"Programação Diária","descricao":"Painel da programação do dia, com a situação de cada etapa da operação.\n\n- **Filtros:** Tipo Operação, Motorista, Booking, Data Estufagem Inicial e Final, Placa e filtros de situação (Programação Estufagem, Motorista e Veículo Programado, Liberado Carregar Vazio, Vazio Carregado, Sem Programação, Sem Carregar Vazio, Sem Veículo).\n- **Vistoria (botão laranja):** abre a vistoria dos registros.\n- **Indicadores:** Prog. da Estufagem, Motorista e Veículo Programado, Liberado Carregar Vazio, Carregado Vazio, A Caminho Estufagem, Sem Data Programada, Sem Carregar Vazio, Vinculados / Solteiros e Sem Vinculação.","conexoes":[{"destino":"20-operacional-monitoramento-vistoria","texto":"O botão laranja Vistoria abre a vistoria dos registros."}],"marcadores":[],"dica":""},{"id":"07-monitoramento-estufagem-interior","arquivo":"imagens/07-monitoramento-estufagem-interior.jpg","modulo":"Monitoramento","titulo":"Estufagem Interior","descricao":"Acompanha as estufagens realizadas no interior.\n\n- **Filtros:** Booking, Data Estufagem Inicial e Final, Motorista, Placa e as etapas (Chegada Cliente, Falta Chegar, Estufado 1, Estufado 2, NF, DDI, Liberado).\n- **Indicadores:** Caminho Estufagem, Chegada Cliente, Estufado 1, Estufado 2 e Liberado.","conexoes":[],"marcadores":[],"dica":""},{"id":"08-monitoramento-entrega-cheio","arquivo":"imagens/08-monitoramento-entrega-cheio.jpg","modulo":"Monitoramento","titulo":"Entrega Cheio","descricao":"Acompanha a entrega de containers cheios no terminal.\n\n- **Filtros:** Booking, Data Estufagem Inicial e Final, Data Agendamento, Motorista, Caminho Entrega, Chegada Terminal, Dead Line, Entregue 1 Container, Entregue 2 Container, Finalizado, Fin. Atraso e Status.\n- **Vistoria (botão laranja):** abre a vistoria.\n- **Indicadores:** Caminho Entrega, Chegada no Terminal, Dead Line, Entregue 1 Container, Entregue 2 Container, Finalizado e Não Finalizado.","conexoes":[{"destino":"20-operacional-monitoramento-vistoria","texto":"O botão laranja Vistoria abre a vistoria."}],"marcadores":[],"dica":""},{"id":"09-monitoramento-entregas-interior","arquivo":"imagens/09-monitoramento-entregas-interior.jpg","modulo":"Monitoramento","titulo":"Entregas Interior","descricao":"Mesma estrutura de **Entrega Cheio**, para as entregas do interior.","conexoes":[{"destino":"08-monitoramento-entrega-cheio","texto":"Mesma estrutura de Entrega Cheio, para o interior."}],"marcadores":[],"dica":""},{"id":"10-patio-cancel-carregamento","arquivo":"imagens/10-patio-cancel-carregamento.jpg","modulo":"Pátio","titulo":"Cancel. Carregamento","descricao":"Localiza um carregamento para cancelá-lo.\n\n1. Em **Buscar por**, escolha o critério (por exemplo, Booking).\n2. Digite o valor em **Texto da busca** e clique em **Buscar**.\n3. Na lista de resultados, cancele o carregamento desejado.","conexoes":[],"marcadores":[],"dica":""},{"id":"11-patio-programacao-carregamento","arquivo":"imagens/11-patio-programacao-carregamento.jpg","modulo":"Pátio","titulo":"Programação Carregamento","descricao":"Mostra a programação de carregamento no pátio.\n\n- **Filtros:** Motorista, Booking e Motoristas Liberados.\n- **⟳:** atualiza a lista.","conexoes":[],"marcadores":[],"dica":""},{"id":"12-acesso-usuario","arquivo":"imagens/12-acesso-usuario.jpg","modulo":"Acesso","titulo":"Usuário","descricao":"Consulta e cadastro dos usuários do sistema.\n\n- **Buscar por** (por exemplo, Login) + **Texto da busca** + **Buscar**.\n- **+ no cabeçalho do painel:** cadastra um novo usuário.","conexoes":[],"marcadores":[],"dica":""},{"id":"13-acesso-perfil-de-acesso","arquivo":"imagens/13-acesso-perfil-de-acesso.jpg","modulo":"Acesso","titulo":"Perfil de Acesso","descricao":"Define os perfis que controlam o que cada usuário pode acessar.\n\n- **Novo perfil:** preencha **Descrição** (obrigatório), marque **Ativo** e clique em **Confirmar**.\n- **Consulta:** filtre pela **Descrição** e clique em **Buscar**.\n- **Botões acima da grade:** exportam ou imprimem a lista.\n- **Ações por perfil:** ✏️ editar, 🗑️ excluir e ▤ permissões do perfil.\n- Exemplos de perfis existentes: Administrador, Arquiteto HelpDesk, Cliente, Conferente, HelpDesk, Motorista e Motorista Agregado.","conexoes":[{"destino":"12-acesso-usuario","texto":"O perfil definido aqui é atribuído a cada usuário."}],"marcadores":[],"dica":""},{"id":"14-cadastros-grupo-de-clientes","arquivo":"imagens/14-cadastros-grupo-de-clientes.jpg","modulo":"Cadastros Operacionais","titulo":"Grupo de Clientes","descricao":"- **Pesquisa Grupos:** Buscar por (Nome) + Texto da busca + **Buscar**.\n- **Cadastre um novo Grupo:** informe o **Nome do Grupo** e clique em **Confirmar**.","conexoes":[],"marcadores":[],"dica":""},{"id":"15-cadastros-eventos-estufagem","arquivo":"imagens/15-cadastros-eventos-estufagem.jpg","modulo":"Cadastros Operacionais","titulo":"Eventos Estufagem","descricao":"Cadastro dos eventos que podem ocorrer durante a estufagem. Use o + do cabeçalho para incluir um evento.","conexoes":[],"marcadores":[],"dica":""},{"id":"16-cadastros-procedimentos","arquivo":"imagens/16-cadastros-procedimentos.jpg","modulo":"Cadastros Operacionais","titulo":"Procedimentos","descricao":"- **Novo procedimento:** informe o **Nome** (obrigatório), escolha a **Cor** e clique em **Confirmar**.\n- **Consulta:** Buscar por (Nome) + Texto da busca + **Buscar**.","conexoes":[],"marcadores":[],"dica":""},{"id":"17-cadastros-status-entrega-cheio","arquivo":"imagens/17-cadastros-status-entrega-cheio.jpg","modulo":"Cadastros Operacionais","titulo":"Status Entrega Cheio","descricao":"Cadastro dos status usados em **Monitoramento > Entrega Cheio**. Funciona igual a Procedimentos: **Nome**, **Cor** e **Confirmar**.","conexoes":[{"destino":"08-monitoramento-entrega-cheio","texto":"Os status cadastrados aqui são usados em Monitoramento > Entrega Cheio."}],"marcadores":[],"dica":""},{"id":"18-cadastros-tipos-eventos-motoristas-veiculos","arquivo":"imagens/18-cadastros-tipos-eventos-motoristas-veiculos.jpg","modulo":"Cadastros Operacionais","titulo":"Tipos Eventos Motoristas/Veículos","descricao":"Cadastro dos tipos de evento que afetam a disponibilidade de motoristas e veículos.\n\n- **Consulta:** Buscar por (Código) + Valor + **Buscar**.\n- **+ Novo:** cadastra um tipo de evento.\n- **Colunas:** Código, Descrição, Tipo (**MOT** = motorista, **VEI** = veículo) e Ações.\n- Exemplos: Atestado Médico, Compromisso, Day Off, Férias, Manutenção (veículo) e Médico.","conexoes":[{"destino":"22-operacional-eventos-motoristas-veiculos","texto":"Os tipos cadastrados aqui são escolhidos ao lançar um evento de motorista/veículo."}],"marcadores":[],"dica":""},{"id":"18b-cadastros-embalagens","arquivo":"imagens/18b-cadastros-embalagens.jpg","modulo":"Cadastros Operacionais","titulo":"Embalagens","descricao":"Cadastro das embalagens. Busca por Nome; use o + do cabeçalho para incluir uma embalagem.","conexoes":[],"marcadores":[],"dica":""},{"id":"19-cadastros-tipo-container","arquivo":"imagens/19-cadastros-tipo-container.jpg","modulo":"Cadastros Operacionais","titulo":"Tipo Container","descricao":"Cadastro dos tipos de container. Busca por Nome; use o + do cabeçalho para incluir um tipo.","conexoes":[],"marcadores":[],"dica":""},{"id":"20-operacional-monitoramento-vistoria","arquivo":"imagens/20-operacional-monitoramento-vistoria.jpg","modulo":"Operacional","titulo":"Monitoramento Vistoria","descricao":"Painel central das vistorias.\n\n- **Filtros:** Cliente, Booking, Ref. Interna, Ref. Cliente, Tipo Operação, Data da Estufagem, Data da Instrução, Data da Retirada, Motorista/Placa, A Liberar e A Vistoriar.\n- **Indicadores:** Vistoria a Realizar, Vistoria Realizada, Depots a confirmar, Mot./Veíc. programado, Prog. estufagem, A caminho estufagem, Chegada ao cliente, Estufado e Vistoria (role a barra horizontal para ver todos).\n- **Legenda de cores:**\n\n- Operação / Azul: Retirada hoje sem container\n- Operação / Verde: Retirada hoje com container\n- Operação / Roxo: Retiradas do próximo dia útil sem container\n- Estufagem / Azul: Estufagem hoje\n- Estufagem / Vermelho: Estufagem no próximo dia útil\n- Draft / Vermelho: Draft com data de retirada do dia\n- Booking / Vermelho: Sem cadastro da instrução","conexoes":[],"marcadores":[],"dica":""},{"id":"21-operacional-instrucoes-vistoria","arquivo":"imagens/21-operacional-instrucoes-vistoria.jpg","modulo":"Operacional","titulo":"Instruções Vistoria","descricao":"Consulta e cadastro das instruções de vistoria. Busca por Booking; use o + do cabeçalho para incluir uma instrução.","conexoes":[{"destino":"20-operacional-monitoramento-vistoria","texto":"A instrução cadastrada aqui aparece no Monitoramento Vistoria (Booking em vermelho = sem instrução)."}],"marcadores":[],"dica":""},{"id":"22-operacional-eventos-motoristas-veiculos","arquivo":"imagens/22-operacional-eventos-motoristas-veiculos.jpg","modulo":"Operacional","titulo":"Eventos Motoristas/Veículos","descricao":"Cadastro e acompanhamento dos eventos que afetam a disponibilidade de motoristas e veículos (férias, atestados, manutenção etc.).\n\n- **Cards no topo:** Motoristas com eventos hoje e Veículos com eventos hoje.\n- **Abas:** **Motoristas** e **Veículos**, cada uma com a quantidade de eventos.\n- **Filtros:** Tipo de Evento, Motorista, Período de início e Período de fim.\n- **Botões:** **Consultar**, **Limpar** e **+ Novo Evento**.\n\n**Importante:** eventos ativos bloqueiam a programação de motoristas e veículos nas datas informadas.","conexoes":[{"destino":"23-operacional-disponibilidade-veiculos","texto":"Eventos ativos bloqueiam a programação de motoristas e veículos nas datas informadas."}],"marcadores":[],"dica":""},{"id":"23-operacional-disponibilidade-veiculos","arquivo":"imagens/23-operacional-disponibilidade-veiculos.jpg","modulo":"Operacional","titulo":"Disponibilidade de Veículos","descricao":"Painel de controle para distribuir embarques, considerando motoristas, chegada aos portos de descarga na baixada, tipo de equipamento, eventos e prioridades operacionais.\n\n- **Data de Marcação da Vez:** data de referência do painel (com a data limite da estufagem interior). O botão **Histórico** mostra os dias anteriores.\n- **Filtros:** Data de Marcação da Vez, Motorista e Placa. Botões **Consultar** e **Limpar**.\n- **Veículos Programados:** veículos já programados para a data.\n- **Placas / Equipamentos sem vinculação:** fila de chegada com Editar, Chegada no Porto, Observações, Booking, CPF, Motorista e placas (cavalo e carretas). Exporta para Copy, CSV, Excel, PDF e Print.\n- **Aba lateral \"Ordem veículos\":** mostra a ordem dos veículos.","conexoes":[],"marcadores":[],"dica":""},{"id":"24-dashboards-tracking-motorista","arquivo":"imagens/24-dashboards-tracking-motorista.jpg","modulo":"Dashboards","titulo":"Tracking Motorista","descricao":"Mapa com a localização dos motoristas.","conexoes":[],"marcadores":[],"dica":""},{"id":"25-dashboards-monit-transporte","arquivo":"imagens/25-dashboards-monit-transporte.jpg","modulo":"Dashboards","titulo":"Monit Transporte","descricao":"Painel de transporte com os mesmos filtros e indicadores de **Operacional > Monitoramento Vistoria**.","conexoes":[{"destino":"20-operacional-monitoramento-vistoria","texto":"Usa os mesmos filtros e indicadores do Monitoramento Vistoria."}],"marcadores":[],"dica":""},{"id":"26-cliente-consulta-online","arquivo":"imagens/26-cliente-consulta-online.jpg","modulo":"Cliente","titulo":"Consulta Online","descricao":"Consulta integrada de Vistoria, Draft e Ordem de Carregamento, voltada ao cliente.\n\n1. Selecione o **Cliente** e informe a **Referência Cliente** ou o **Booking** (obrigatórios).\n2. Clique em **Atualizar**.\n3. Confira os indicadores: Vistoria Realizada, Vistoria a Realizar, Bookings, Draft, Ordens e Containers.\n4. Use as abas **Vistoria**, **Draft** e **Ordem de Carregamento** para ver os detalhes.","conexoes":[],"marcadores":[],"dica":""},{"id":"27-integracao-prc","arquivo":"imagens/27-integracao-prc.jpg","modulo":"Integração","titulo":"Integração PRC","descricao":"Consulta das integrações PRC. Busca por Booking; use o + do cabeçalho para incluir um registro.","conexoes":[],"marcadores":[],"dica":""},{"id":"28-lacres-cadastro","arquivo":"imagens/28-lacres-cadastro.jpg","modulo":"Lacres","titulo":"Cadastro Lacres","descricao":"Cadastro dos lacres. Busca por Tipo de Lacre; use o + do cabeçalho para incluir lacres.","conexoes":[{"destino":"29-lacres-gerenciamento","texto":"Os lacres cadastrados entram no estoque controlado em Gerenciamento."}],"marcadores":[],"dica":""},{"id":"29-lacres-gerenciamento","arquivo":"imagens/29-lacres-gerenciamento.jpg","modulo":"Lacres","titulo":"Gerenciamento","descricao":"Controle do estoque e do uso de lacres.\n\n- **Filtros:** Filial (obrigatório), Cliente, Tipo de Lacre (obrigatório), Número Inicial, Número Final, Funcionário Responsável e Situação (Todos).\n- **Botões:** ⟳ atualiza e 🖨️ imprime.\n- **Indicadores:** **Estoque** (azul), **Entregue** (verde), **Utilizado** (roxo) e **Devolvido** (vermelho).","conexoes":[],"marcadores":[],"dica":""},{"id":"30-relatorios-resumo-embarques","arquivo":"imagens/30-relatorios-resumo-embarques.jpg","modulo":"Relatórios","titulo":"Resumo Embarques","descricao":"1. Escolha o **Cliente** (ou Todos).\n2. Escolha o período inicial e final em **Ano/Mês**.\n3. Clique em **Confirmar** para gerar o resumo.","conexoes":[],"marcadores":[],"dica":""},{"id":"31-auditoria","arquivo":"imagens/31-auditoria.jpg","modulo":"Auditoria Registros","titulo":"Auditoria","descricao":"Consulta das alterações feitas no sistema.\n\n- **Filtros:** Usuário, Operação e Data.\n- **Setas ◀ ▶:** navegam entre os registros.","conexoes":[],"marcadores":[],"dica":""},{"id":"32-helpdesk-dashboard","arquivo":"imagens/32-helpdesk-dashboard.jpg","modulo":"HelpDesk","titulo":"Dashboard","descricao":"Indicadores dos chamados: SLA, horas de resolução e distribuição operacional.\n\n- **Filtros:** Data inicial, Data final, Status, Departamento, Usuário solicitante e Usuário responsável. Clique em **Atualizar** para aplicar.\n- **Indicadores:** Chamados Criados, 1ª Resposta (% dentro do SLA), Resolução (% dentro do SLA), Pesquisa (média da avaliação), Fechados e Horas Totais.\n- **Gráficos:** Chamados por Status e Chamados por Categoria.","conexoes":[],"marcadores":[],"dica":""},{"id":"33-helpdesk-criacao-ticket","arquivo":"imagens/33-helpdesk-criacao-ticket.jpg","modulo":"HelpDesk","titulo":"Criação Ticket","descricao":"Consulta, filtro e gestão dos chamados.\n\n- **Filtros de Pesquisa:** Tipo Busca (por exemplo, Nº Ticket), Pesquisar, Status e Prioridade.\n- **Buscar:** lista os tickets em **Lista de Tickets**, onde é possível editar e excluir.\n- **+ Novo:** abre um novo chamado.","conexoes":[{"destino":"32-helpdesk-dashboard","texto":"Os tickets alimentam os indicadores do Dashboard do HelpDesk."}],"marcadores":[],"dica":""},{"id":"34-helpdesk-sla","arquivo":"imagens/34-helpdesk-sla.jpg","modulo":"HelpDesk","titulo":"SLA","descricao":"Cadastro dos prazos de SLA. Busca por Prioridade; **+ Novo** inclui um SLA.","conexoes":[{"destino":"33-helpdesk-criacao-ticket","texto":"Os prazos de SLA são aplicados aos tickets."}],"marcadores":[],"dica":""},{"id":"35-helpdesk-manual","arquivo":"imagens/35-helpdesk-manual.jpg","modulo":"HelpDesk","titulo":"Manual","descricao":"Deveria mostrar o manual do HelpDesk, mas a página retorna erro. Veja Problemas conhecidos.","conexoes":[],"marcadores":[],"dica":""},{"id":"36-helpdesk-prioridade","arquivo":"imagens/36-helpdesk-prioridade.jpg","modulo":"HelpDesk","titulo":"Prioridade","descricao":"Cadastro das prioridades dos chamados. Busca por Nome; **+ Novo** inclui uma prioridade.","conexoes":[{"destino":"33-helpdesk-criacao-ticket","texto":"As prioridades cadastradas são escolhidas ao abrir um ticket."}],"marcadores":[],"dica":""},{"id":"37-helpdesk-categoria","arquivo":"imagens/37-helpdesk-categoria.jpg","modulo":"HelpDesk","titulo":"Categoria","descricao":"Cadastro das categorias dos chamados (por exemplo, Outros, Operacional, Vistoria, Acesso e Carregamento). Busca por Nome; **+ Novo** inclui uma categoria.","conexoes":[{"destino":"33-helpdesk-criacao-ticket","texto":"As categorias cadastradas são escolhidas ao abrir um ticket."}],"marcadores":[],"dica":""},{"id":"38-helpdesk-departamentos","arquivo":"imagens/38-helpdesk-departamentos.jpg","modulo":"HelpDesk","titulo":"Departamentos","descricao":"Cadastro dos departamentos. Busca por Código; use o + do cabeçalho para incluir um departamento.","conexoes":[{"destino":"33-helpdesk-criacao-ticket","texto":"Os departamentos cadastrados são usados nos tickets."}],"marcadores":[],"dica":""},{"id":"39-helpdesk-manual-updates","arquivo":"imagens/39-helpdesk-manual-updates.jpg","modulo":"HelpDesk","titulo":"Manual Updates","descricao":"Manual do sistema de controle de versões e updates, com objetivo, escopo (cadastro de versões e updates, detalhamento das alterações, testes e homologações, aprovações, controle de implantação e evidências) e perfis de acesso.","conexoes":[{"destino":"40-updates-cadastro-versao","texto":"Documenta o processo de controle de versões e updates."}],"marcadores":[],"dica":""},{"id":"40-updates-cadastro-versao","arquivo":"imagens/40-updates-cadastro-versao.jpg","modulo":"Updates Version","titulo":"Cadastro Versão","descricao":"Registro das versões e updates do sistema. Busca por Código; **+ Novo update** registra um update.","conexoes":[{"destino":"41-updates-aprovacao-versao","texto":"A versão cadastrada segue para aprovação."}],"marcadores":[],"dica":""},{"id":"41-updates-aprovacao-versao","arquivo":"imagens/41-updates-aprovacao-versao.jpg","modulo":"Updates Version","titulo":"Aprovação Versão","descricao":"Aprovação das versões cadastradas. Busque por Código e aprove a versão desejada.","conexoes":[],"marcadores":[],"dica":""},{"id":"42-updates-cadastro-modulos","arquivo":"imagens/42-updates-cadastro-modulos.jpg","modulo":"Updates Version","titulo":"Cadastro de Módulos","descricao":"Cadastro dos módulos do sistema que recebem versões. Busca por Nome do Módulo; **+ Novo módulo** inclui um módulo.","conexoes":[{"destino":"40-updates-cadastro-versao","texto":"Os módulos cadastrados aqui recebem as versões registradas em Cadastro Versão."}],"marcadores":[],"dica":""},{"id":"43-console-dbconsole","arquivo":"imagens/43-console-dbconsole.jpg","modulo":"Console","titulo":"DBConsole","descricao":"Console de banco de dados para consulta, exploração de objetos e execução de SQL. Uso restrito à equipe técnica.\n\n1. Selecione o **Tipo de banco** (por exemplo, SQL Server) e a **Conexão** (por exemplo, FRITRANSP).\n2. Informe **Usuário** e **Senha** do banco e clique em **Conectar**.\n3. Navegue pelos objetos em **Objetos do Banco** (botão **Atualizar** recarrega a lista).\n4. Use **Janela SQL** para executar comandos.","conexoes":[],"marcadores":[],"dica":""}];
+</script>
+<script>
+const PAGINA_ORIGINAL = document.documentElement.outerHTML;
+(() => {
+  'use strict';
+
+  const LEITURA = !!window.FRI_LEITURA;
+  const $ = (s, el = document) => el.querySelector(s);
+  const el = (tag, attrs = {}, ...filhos) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') n.className = v;
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) n.setAttribute(k, v === true ? '' : v);
+    }
+    for (const f of filhos.flat()) if (f != null) n.append(f.nodeType ? f : document.createTextNode(f));
+    return n;
+  };
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const clone = o => JSON.parse(JSON.stringify(o));
+
+  /* ---------- Estado ---------- */
+  let estado = null;      // { versao, telas: [...] }
+  let atualId = null;
+  let marcSel = null;     // id do marcador selecionado
+  let modo = LEITURA ? 'apresentar' : 'editar';
+
+  function estadoInicial() {
+    return { versao: 1, telas: clone(DADOS_INICIAIS) };
+  }
+  function normalizar(e) {
+    e.telas.forEach(t => {
+      t.marcadores ||= [];
+      t.conexoes ||= [];
+      t.descricao ||= '';
+      t.dica ||= '';
+      t.modulo ||= 'Novas telas';
+    });
+    return e;
+  }
+  // Os prints originais vêm sempre do arquivo atual; o que foi salvo no navegador
+  // guarda só as anotações. Telas novas do arquivo entram no fim do seu módulo.
+  // Telas que saíram do manual; somem também do que estiver salvo no navegador.
+  const TELAS_REMOVIDAS = ['44-configuracoes'];
+
+  function mesclarComIniciais(e) {
+    e.telas = e.telas.filter(t => !TELAS_REMOVIDAS.includes(t.id));
+    e.telas.forEach(t => {
+      t.conexoes = t.conexoes.filter(c => !TELAS_REMOVIDAS.includes(c.destino));
+      t.marcadores.forEach(m => { if (TELAS_REMOVIDAS.includes(m.destino)) m.destino = ''; });
+    });
+    const iniciais = new Map(DADOS_INICIAIS.map(t => [t.id, t]));
+    e.telas.forEach(t => {
+      const ini = iniciais.get(t.id);
+      if (!ini || t.imagemPropria) return;
+      t.arquivo = ini.arquivo;
+      if (ini.imagem) t.imagem = ini.imagem; else delete t.imagem;
+    });
+    const existentes = new Set(e.telas.map(t => t.id));
+    DADOS_INICIAIS.forEach((ini, i) => {
+      if (existentes.has(ini.id)) return;
+      const anterior = DADOS_INICIAIS.slice(0, i).reverse().find(x => existentes.has(x.id));
+      const pos = anterior ? e.telas.findIndex(t => t.id === anterior.id) + 1 : 0;
+      e.telas.splice(pos, 0, clone(ini));
+      existentes.add(ini.id);
+    });
+    return e;
+  }
+  const tela = id => estado.telas.find(t => t.id === id);
+  const atual = () => tela(atualId);
+  const nomeTela = t => t ? (t.modulo && t.modulo !== 'Geral' ? `${t.modulo} › ${t.titulo}` : t.titulo) : '(tela removida)';
+
+  /* ---------- Armazenamento (IndexedDB) ---------- */
+  const DB_NOME = 'anotador-fri', LOJA = 'dados';
+  function abrirDb() {
+    return new Promise((ok, falha) => {
+      const r = indexedDB.open(DB_NOME, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(LOJA);
+      r.onsuccess = () => ok(r.result);
+      r.onerror = () => falha(r.error);
+    });
+  }
+  async function lerDb() {
+    try {
+      const db = await abrirDb();
+      return await new Promise((ok, falha) => {
+        const r = db.transaction(LOJA).objectStore(LOJA).get('estado');
+        r.onsuccess = () => ok(r.result || null);
+        r.onerror = () => falha(r.error);
+      });
+    } catch (e) { console.warn('Sem IndexedDB', e); return null; }
+  }
+  async function gravarDb() {
+    try {
+      const db = await abrirDb();
+      await new Promise((ok, falha) => {
+        const tx = db.transaction(LOJA, 'readwrite');
+        tx.objectStore(LOJA).put(estado, 'estado');
+        tx.oncomplete = ok;
+        tx.onerror = () => falha(tx.error);
+      });
+      $('#saveState').textContent = 'Salvo ✓';
+    } catch (e) {
+      $('#saveState').textContent = 'Erro ao salvar';
+      aviso('Não foi possível salvar no navegador. Use Arquivo › Salvar backup.');
+    }
+  }
+  let timerSalvar = null;
+  function salvar() {
+    if (LEITURA) return;
+    $('#saveState').textContent = 'Salvando…';
+    clearTimeout(timerSalvar);
+    timerSalvar = setTimeout(gravarDb, 400);
+  }
+
+  function aviso(msg) {
+    const t = el('div', { class: 'toast' }, msg);
+    document.body.append(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  /* ---------- Texto com formatação simples ---------- */
+  function escapar(s) {
+    return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function formatar(txt) {
+    const linhas = escapar(txt || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').split('\n');
+    let html = '', lista = false, par = [];
+    const fecharPar = () => { if (par.length) { html += `<p>${par.join('<br>')}</p>`; par = []; } };
+    for (const l of linhas) {
+      const item = l.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)/);
+      if (item) {
+        fecharPar();
+        if (!lista) { html += '<ul>'; lista = true; }
+        html += `<li>${item[1]}</li>`;
+      } else {
+        if (lista) { html += '</ul>'; lista = false; }
+        if (l.trim() === '') fecharPar(); else par.push(l);
+      }
+    }
+    fecharPar();
+    if (lista) html += '</ul>';
+    return html;
+  }
+  function blocoTexto(txt, vazio) {
+    const d = el('div', { class: 'texto' });
+    if (txt && txt.trim()) d.innerHTML = formatar(txt);
+    else d.append(el('p', { class: 'vazio' }, vazio));
+    return d;
+  }
+
+  /* ---------- Lista lateral ---------- */
+  function modulosOrdenados() {
+    const ordem = [];
+    estado.telas.forEach(t => { if (!ordem.includes(t.modulo)) ordem.push(t.modulo); });
+    return ordem;
+  }
+  function renderLista() {
+    const filtro = $('#busca').value.trim().toLowerCase();
+    const nav = $('#listaTelas');
+    nav.innerHTML = '';
+    for (const mod of modulosOrdenados()) {
+      const telas = estado.telas.filter(t => t.modulo === mod &&
+        (!filtro || (t.titulo + ' ' + t.modulo + ' ' + t.descricao).toLowerCase().includes(filtro)));
+      if (!telas.length) continue;
+      nav.append(el('div', { class: 'grupo-titulo' }, mod));
+      for (const t of telas) {
+        const nLig = t.conexoes.length + t.marcadores.filter(m => m.destino).length;
+        nav.append(el('button', {
+          class: 'item-tela' + (t.id === atualId ? ' ativo' : ''),
+          title: nomeTela(t),
+          onclick: () => abrirTela(t.id)
+        },
+          el('span', { class: 'ok' }, !LEITURA && t.revisada ? '✓' : ''),
+          el('span', { class: 'nome' }, t.titulo),
+          el('span', { class: 'contagem' }, `${t.marcadores.length ? '● ' + t.marcadores.length : ''}${nLig ? '  ↔ ' + nLig : ''}`)
+        ));
+      }
+    }
+    const revisadas = estado.telas.filter(t => t.revisada).length;
+    $('#txtProgresso').textContent = `${revisadas} de ${estado.telas.length} telas revisadas`;
+    $('#barraProgresso').style.width = (estado.telas.length ? 100 * revisadas / estado.telas.length : 0) + '%';
+    const ativo = $('.item-tela.ativo', nav);
+    if (ativo) ativo.scrollIntoView({ block: 'nearest' });
+  }
+
+  /* ---------- Tela atual ---------- */
+  function abrirTela(id, idMarcador = null) {
+    if (!tela(id)) return;
+    atualId = id;
+    marcSel = idMarcador;
+    fecharBalao();
+    mostrarVista('tela');
+    renderLista();
+    renderTela();
+    if (idMarcador && modo === 'apresentar') {
+      requestAnimationFrame(() => abrirBalao(idMarcador));
+    }
+    $('#palco').scrollTop = 0;
+    try { history.replaceState(null, '', '#' + id); } catch (e) {}
+  }
+
+  function renderTela() {
+    const t = atual();
+    if (!t) return;
+    $('#cabModulo').textContent = t.modulo === 'Geral' ? 'Sistema FRI' : t.modulo;
+    $('#cabTitulo').textContent = t.titulo;
+    const img = $('#imgTela');
+    img.src = t.imagem || t.arquivo || '';
+    img.alt = nomeTela(t);
+    $('#quadro').classList.toggle('editando', modo === 'editar');
+    $('#dicaUso').innerHTML = modo === 'editar'
+      ? '<strong>Modo edição:</strong> clique no print para criar um marcador · arraste um marcador para movê-lo · use ← → para trocar de tela.'
+      : '<span class="legenda"><span><i></i> explica um item da tela</span><span><i class="liga"></i> leva para outra tela</span><span>Clique nos números para ver a explicação.</span></span>';
+    renderMarcadores();
+    renderPainel();
+  }
+
+  function renderMarcadores() {
+    const q = $('#quadro');
+    q.querySelectorAll('.marcador').forEach(m => m.remove());
+    atual().marcadores.forEach((m, i) => {
+      const b = el('button', {
+        class: 'marcador' + (m.destino ? ' liga' : '') + (m.id === marcSel ? ' sel' : ''),
+        style: `left:${m.x}%;top:${m.y}%`,
+        title: m.titulo || `Marcador ${i + 1}`,
+        'data-id': m.id
+      }, String(i + 1));
+      b.addEventListener('pointerdown', ev => iniciarArraste(ev, m, b));
+      q.append(b);
+    });
+  }
+
+  // Clique no print cria marcador; arrastar move
+  let arrastando = null;
+  function posRelativa(ev) {
+    const r = $('#imgTela').getBoundingClientRect();
+    return {
+      x: Math.min(100, Math.max(0, (ev.clientX - r.left) / r.width * 100)),
+      y: Math.min(100, Math.max(0, (ev.clientY - r.top) / r.height * 100))
+    };
+  }
+  function iniciarArraste(ev, m, b) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    arrastando = { m, b, x0: ev.clientX, y0: ev.clientY, moveu: false };
+    b.setPointerCapture(ev.pointerId);
+    b.onpointermove = e => {
+      if (modo !== 'editar') return;
+      if (!arrastando.moveu && Math.hypot(e.clientX - arrastando.x0, e.clientY - arrastando.y0) < 4) return;
+      arrastando.moveu = true;
+      const p = posRelativa(e);
+      m.x = +p.x.toFixed(2); m.y = +p.y.toFixed(2);
+      b.style.left = m.x + '%'; b.style.top = m.y + '%';
+    };
+    b.onpointerup = () => {
+      b.onpointermove = b.onpointerup = null;
+      const moveu = arrastando.moveu;
+      arrastando = null;
+      if (moveu) { salvar(); return; }
+      if (modo === 'editar') selecionarMarcador(m.id);
+      else abrirBalao(m.id);
+    };
+  }
+  $('#quadro').addEventListener('click', ev => {
+    if (ev.target.closest('.marcador') || ev.target.closest('.balao')) return;
+    if (modo !== 'editar') { fecharBalao(); return; }
+    if (ev.target !== $('#imgTela')) return;
+    const p = posRelativa(ev);
+    const m = { id: uid(), x: +p.x.toFixed(2), y: +p.y.toFixed(2), titulo: '', texto: '', destino: '' };
+    atual().marcadores.push(m);
+    salvar();
+    marcSel = m.id;
+    renderMarcadores();
+    selecionarMarcador(m.id, true);
+    renderLista();
+  });
+
+  function marcarSelecionado() {
+    $('#quadro').querySelectorAll('.marcador').forEach(b => b.classList.toggle('sel', b.dataset.id === marcSel));
+  }
+
+  function selecionarMarcador(id, focar = false) {
+    marcSel = id;
+    marcarSelecionado();
+    renderPainel();
+    if (focar) {
+      const inp = $('#marcTitulo');
+      if (inp) { inp.focus(); inp.scrollIntoView({ block: 'nearest' }); }
+    }
+  }
+
+  /* ---------- Balão (modo apresentação) ---------- */
+  function fecharBalao() { $('#quadro .balao')?.remove(); }
+  function abrirBalao(id) {
+    fecharBalao();
+    const t = atual();
+    const i = t.marcadores.findIndex(m => m.id === id);
+    if (i < 0) return;
+    const m = t.marcadores[i];
+    marcSel = id;
+    marcarSelecionado();
+    renderPainel();
+    const destino = m.destino && tela(m.destino);
+    const b = el('div', { class: 'balao', role: 'dialog' },
+      el('button', { class: 'fechar', title: 'Fechar', onclick: fecharBalao }, '×'),
+      el('h4', {}, `${i + 1}. ${m.titulo || 'Sem título'}`),
+      blocoTexto(m.texto, 'Sem explicação.'),
+      destino ? el('button', { class: 'primary ir', onclick: () => abrirTela(destino.id) }, `Ir para ${destino.titulo} →`) : null
+    );
+    const q = $('#quadro');
+    q.append(b);
+    const larg = q.clientWidth, alt = q.clientHeight;
+    let left = m.x / 100 * larg + 20, top = m.y / 100 * alt - 10;
+    if (left + b.offsetWidth > larg) left = Math.max(0, m.x / 100 * larg - b.offsetWidth - 20);
+    if (top + b.offsetHeight > alt) top = Math.max(0, alt - b.offsetHeight);
+    b.style.left = left + 'px';
+    b.style.top = top + 'px';
+  }
+
+  /* ---------- Painel lateral ---------- */
+  function opcoesTelas(selecionada, excluirId) {
+    const sel = el('select');
+    sel.append(el('option', { value: '' }, '— nenhuma —'));
+    for (const mod of modulosOrdenados()) {
+      const g = el('optgroup', { label: mod });
+      estado.telas.filter(t => t.modulo === mod && t.id !== excluirId)
+        .forEach(t => g.append(el('option', { value: t.id, selected: t.id === selecionada }, t.titulo)));
+      sel.append(g);
+    }
+    return sel;
+  }
+
+  function entradas() {
+    // Quem aponta para a tela atual
+    const lista = [];
+    for (const t of estado.telas) {
+      if (t.id === atualId) continue;
+      t.conexoes.forEach(c => { if (c.destino === atualId) lista.push({ origem: t, texto: c.texto }); });
+      t.marcadores.forEach((m, i) => {
+        if (m.destino === atualId) lista.push({ origem: t, texto: m.titulo, marcador: m, num: i + 1 });
+      });
+    }
+    return lista;
+  }
+
+  function renderPainel() {
+    const p = $('#painel');
+    const t = atual();
+    p.innerHTML = '';
+    if (modo === 'editar') renderPainelEdicao(p, t); else renderPainelLeitura(p, t);
+  }
+
+  function renderPainelLeitura(p, t) {
+    p.append(el('div', { class: 'secao' },
+      el('h3', {}, 'O que é esta tela'),
+      blocoTexto(t.descricao, 'Sem descrição.')
+    ));
+    if (t.dica && t.dica.trim()) {
+      p.append(el('div', { class: 'secao' }, el('h3', {}, 'Dica do instrutor'), blocoTexto(t.dica, '')));
+    }
+    const sec = el('div', { class: 'secao' }, el('h3', {}, 'Itens da tela'));
+    if (!t.marcadores.length) sec.append(el('p', { class: 'vazio' }, 'Nenhum item marcado.'));
+    else sec.append(listaMarcadores(t, id => abrirBalao(id)));
+    p.append(sec);
+    p.append(secaoLigacoes(t, false));
+  }
+
+  function listaMarcadores(t, aoClicar) {
+    const ul = el('ul', { class: 'lista-marc' });
+    t.marcadores.forEach((m, i) => {
+      const dest = m.destino && tela(m.destino);
+      ul.append(el('li', { class: m.id === marcSel ? 'sel' : '', onclick: () => aoClicar(m.id) },
+        el('span', { class: 'num' + (m.destino ? ' liga' : '') }, String(i + 1)),
+        el('div', { class: 'info' },
+          el('div', {}, m.titulo || el('span', { class: 'vazio' }, 'Sem título')),
+          dest ? el('small', {}, '→ leva para ' + dest.titulo) : null
+        )
+      ));
+    });
+    return ul;
+  }
+
+  function secaoLigacoes(t, edicao) {
+    const sec = el('div', { class: 'secao' }, el('h3', {}, 'Onde esta tela se conecta'));
+    const saidas = [];
+    t.conexoes.forEach(c => saidas.push({ destino: tela(c.destino), texto: c.texto }));
+    t.marcadores.forEach((m, i) => { if (m.destino) saidas.push({ destino: tela(m.destino), texto: m.titulo, num: i + 1, marcador: m }); });
+
+    if (!edicao) {
+      sec.append(el('div', { style: 'font-weight:600;margin-bottom:4px' }, 'Leva para'));
+      if (!saidas.length) sec.append(el('p', { class: 'vazio' }, 'Nenhuma tela.'));
+      saidas.forEach(s => sec.append(itemLigacao('→', s.destino, s.texto, s.num)));
+    } else {
+      sec.querySelector('h3').append(el('button', { class: 'acao', onclick: () => {
+        t.conexoes.push({ destino: '', texto: '' }); salvar(); renderPainel();
+        const ult = [...$('#painel').querySelectorAll('.conexao select')].pop();
+        ult?.focus();
+      } }, '+ Conexão'));
+      sec.append(el('div', { style: 'font-weight:600;margin-bottom:6px' }, 'Leva para'));
+      if (!t.conexoes.length) sec.append(el('p', { class: 'vazio' }, 'Nenhuma conexão. Use “+ Conexão” para dizer a qual tela esta leva ou alimenta.'));
+      t.conexoes.forEach((c, i) => {
+        const sel = opcoesTelas(c.destino, t.id);
+        sel.addEventListener('change', () => { c.destino = sel.value; salvar(); renderLista(); });
+        const txt = el('textarea', { placeholder: 'Como se conectam? (ex.: o cadastro feito aqui aparece na outra tela)' });
+        txt.value = c.texto || '';
+        txt.addEventListener('input', () => { c.texto = txt.value; salvar(); });
+        sec.append(el('div', { class: 'conexao' },
+          el('div', { class: 'linha' }, sel,
+            el('button', { title: 'Abrir tela de destino', onclick: () => c.destino && abrirTela(c.destino) }, '↗'),
+            el('button', { class: 'danger', title: 'Remover conexão', onclick: () => { t.conexoes.splice(i, 1); salvar(); renderPainel(); renderLista(); } }, '×')),
+          txt));
+      });
+      const viaMarc = saidas.filter(s => s.marcador);
+      if (viaMarc.length) {
+        sec.append(el('small', { style: 'color:var(--muted)' }, 'Pelos marcadores:'));
+        viaMarc.forEach(s => sec.append(itemLigacao('→', s.destino, s.texto, s.num)));
+      }
+    }
+
+    const ent = entradas();
+    sec.append(el('div', { style: 'font-weight:600;margin:12px 0 4px' }, 'Chegam aqui'));
+    if (!ent.length) sec.append(el('p', { class: 'vazio' }, 'Nenhuma tela aponta para esta.'));
+    ent.forEach(e => sec.append(itemLigacao('←', e.origem, e.texto, e.num, e.marcador)));
+    return sec;
+  }
+
+  function itemLigacao(seta, alvo, texto, num, marcadorAlvo) {
+    return el('div', { class: 'ligacao' },
+      el('span', { class: 'seta' }, seta),
+      el('div', {},
+        alvo ? el('button', { class: 'link-btn', onclick: () => abrirTela(alvo.id, marcadorAlvo?.id || null) }, nomeTela(alvo)) : el('span', { class: 'vazio' }, '(tela não escolhida)'),
+        num ? el('span', { class: 'tag' }, 'marcador ' + num) : null,
+        texto ? el('small', {}, texto) : null
+      ));
+  }
+
+  function campo(rotulo, controle) {
+    return el('label', { class: 'field' }, el('span', {}, rotulo), controle);
+  }
+  function entradaTexto(obj, chave, attrs = {}, aoMudar) {
+    const n = el(attrs.multi ? 'textarea' : 'input', attrs.multi ? { rows: attrs.rows || 4, placeholder: attrs.placeholder || '' } : { type: 'text', placeholder: attrs.placeholder || '', list: attrs.list || null });
+    n.value = obj[chave] || '';
+    n.addEventListener('input', () => { obj[chave] = n.value; salvar(); aoMudar?.(); });
+    return n;
+  }
+
+  function renderPainelEdicao(p, t) {
+    const atualizarCab = () => { $('#cabTitulo').textContent = t.titulo; $('#cabModulo').textContent = t.modulo; renderLista(); };
+    const dl = el('datalist', { id: 'listaModulos' }, modulosOrdenados().map(m => el('option', { value: m })));
+    const chk = el('input', { type: 'checkbox', checked: !!t.revisada });
+    chk.addEventListener('change', () => { t.revisada = chk.checked; salvar(); renderLista(); });
+
+    p.append(el('div', { class: 'secao' },
+      el('h3', {}, 'Sobre a tela'),
+      dl,
+      campo('Módulo (menu)', entradaTexto(t, 'modulo', { list: 'listaModulos' }, atualizarCab)),
+      campo('Nome da tela', entradaTexto(t, 'titulo', {}, atualizarCab)),
+      campo('O que esta tela significa', entradaTexto(t, 'descricao', { multi: true, rows: 7, placeholder: 'Para que serve, quem usa, quando usar…\nUse "- " no início da linha para listas e **texto** para negrito.' })),
+      campo('Dica do instrutor', entradaTexto(t, 'dica', { multi: true, rows: 3, placeholder: 'Observações para a aula, erros comuns, cuidados…' })),
+      el('label', { class: 'check' }, chk, 'Tela revisada'),
+      el('div', { class: 'botoes' },
+        el('button', { onclick: () => $('#inTrocarImg').click() }, 'Trocar print'),
+        el('button', { class: 'danger', onclick: excluirTela }, 'Excluir tela'))
+    ));
+
+    const sec = el('div', { class: 'secao' }, el('h3', {}, 'Marcadores no print'));
+    if (!t.marcadores.length) sec.append(el('p', { class: 'vazio' }, 'Clique em um ponto do print para marcar um botão, campo ou indicador e explicar o que ele faz.'));
+    else sec.append(listaMarcadores(t, id => selecionarMarcador(id)));
+
+    const m = t.marcadores.find(x => x.id === marcSel);
+    if (m) {
+      const i = t.marcadores.indexOf(m);
+      const sel = opcoesTelas(m.destino, t.id);
+      sel.addEventListener('change', () => { m.destino = sel.value; salvar(); renderMarcadores(); renderPainel(); renderLista(); });
+      sec.append(el('div', { class: 'editor-marc' },
+        el('div', { style: 'font-weight:600;margin-bottom:8px' }, `Marcador ${i + 1}`),
+        campo('Título (o que é este item)', Object.assign(entradaTexto(m, 'titulo', { placeholder: 'Ex.: Botão Vistoria' }, () => {
+          const li = $('#painel .lista-marc li.sel .info div'); if (li) li.textContent = m.titulo || 'Sem título';
+        }), { id: 'marcTitulo' })),
+        campo('Explicação', entradaTexto(m, 'texto', { multi: true, rows: 4, placeholder: 'O que acontece ao usar este item?' })),
+        campo('Leva para a tela (opcional)', sel),
+        el('div', { class: 'botoes' },
+          el('button', { onclick: () => { marcSel = null; renderMarcadores(); renderPainel(); } }, 'Concluir'),
+          m.destino ? el('button', { onclick: () => abrirTela(m.destino) }, 'Abrir destino ↗') : null,
+          el('button', { class: 'danger', onclick: () => {
+            t.marcadores.splice(i, 1); marcSel = null; salvar(); renderMarcadores(); renderPainel(); renderLista();
+          } }, 'Excluir marcador'))
+      ));
+    }
+    p.append(sec);
+    p.append(secaoLigacoes(t, true));
+  }
+
+  function excluirTela() {
+    const t = atual();
+    if (!confirm(`Excluir a tela "${nomeTela(t)}" e todas as anotações dela?`)) return;
+    const idx = estado.telas.indexOf(t);
+    estado.telas.splice(idx, 1);
+    estado.telas.forEach(o => {
+      o.conexoes = o.conexoes.filter(c => c.destino !== t.id);
+      o.marcadores.forEach(m => { if (m.destino === t.id) m.destino = ''; });
+    });
+    salvar();
+    const prox = estado.telas[Math.min(idx, estado.telas.length - 1)];
+    if (prox) abrirTela(prox.id); else { atualId = null; renderLista(); $('#painel').innerHTML = ''; }
+  }
+
+  function navegar(delta) {
+    const lista = modulosOrdenados().flatMap(mod => estado.telas.filter(t => t.modulo === mod));
+    const i = lista.findIndex(t => t.id === atualId);
+    const prox = lista[(i + delta + lista.length) % lista.length];
+    if (prox) abrirTela(prox.id);
+  }
+
+  /* ---------- Imagens ---------- */
+  function lerImagem(arquivo) {
+    return new Promise((ok, falha) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const max = 1920;
+          const esc = Math.min(1, max / img.width);
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * esc);
+          c.height = Math.round(img.height * esc);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          ok(c.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = falha;
+        img.src = fr.result;
+      };
+      fr.onerror = falha;
+      fr.readAsDataURL(arquivo);
+    });
+  }
+  $('#inArquivosImg').addEventListener('change', async ev => {
+    const arquivos = [...ev.target.files];
+    ev.target.value = '';
+    let primeira = null;
+    for (const a of arquivos) {
+      try {
+        const imagem = await lerImagem(a);
+        const t = { id: 'tela-' + uid(), modulo: 'Novas telas', titulo: a.name.replace(/\.[^.]+$/, ''), descricao: '', dica: '', imagem, marcadores: [], conexoes: [] };
+        estado.telas.push(t);
+        primeira ||= t.id;
+      } catch (e) { aviso('Não foi possível ler ' + a.name); }
+    }
+    if (primeira) {
+      salvar();
+      abrirTela(primeira);
+      aviso(`${arquivos.length} print(s) adicionado(s) em "Novas telas". Ajuste o módulo e o nome no painel.`);
+    }
+  });
+  $('#inTrocarImg').addEventListener('change', async ev => {
+    const a = ev.target.files[0];
+    ev.target.value = '';
+    if (!a) return;
+    try {
+      atual().imagem = await lerImagem(a);
+      atual().imagemPropria = true;
+      salvar();
+      renderTela();
+      aviso('Print substituído. Confira a posição dos marcadores.');
+    } catch (e) { aviso('Não foi possível ler a imagem.'); }
+  });
+
+  /* ---------- Mapa de conexões ---------- */
+  function mostrarVista(v) {
+    $('#vistaTela').classList.toggle('hidden', v !== 'tela');
+    $('#vistaMapa').classList.toggle('hidden', v !== 'mapa');
+    $('#btVistaTela').classList.toggle('on', v === 'tela');
+    $('#btVistaMapa').classList.toggle('on', v === 'mapa');
+    if (v === 'mapa') renderMapa();
+  }
+
+  function renderMapa() {
+    const svg = $('#mapaSvg');
+    const NS = 'http://www.w3.org/2000/svg';
+    const s = (tag, attrs = {}) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+    svg.innerHTML = '';
+    const mods = modulosOrdenados();
+    const larguraDisp = Math.max(900, $('#vistaMapa').clientWidth - 20);
+    const COL = 220, NO_L = 190, NO_A = 30, GAP = 8, PAD = 14, CAB = 26;
+    const cols = Math.max(1, Math.floor(larguraDisp / COL));
+    const pos = {};
+    let y = 20, linhaAlt = 0, col = 0;
+    const caixas = [];
+    mods.forEach(mod => {
+      const telas = estado.telas.filter(t => t.modulo === mod);
+      const h = CAB + telas.length * (NO_A + GAP) + PAD - GAP;
+      if (col >= cols) { col = 0; y += linhaAlt + 40; linhaAlt = 0; }
+      const x = 20 + col * COL;
+      caixas.push({ mod, x, y, h });
+      telas.forEach((t, i) => { pos[t.id] = { x: x + PAD / 2, y: y + CAB + i * (NO_A + GAP), t }; });
+      linhaAlt = Math.max(linhaAlt, h);
+      col++;
+    });
+    const W = 20 + Math.min(cols, mods.length) * COL + 20, H = y + linhaAlt + 40;
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const defs = s('defs');
+    [['seta', '#7b8a9c'], ['setaMarc', '#e07b00']].forEach(([id, cor]) => {
+      const mk = s('marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
+      mk.append(s('path', { d: 'M0,0 L10,5 L0,10 z', fill: cor }));
+      defs.append(mk);
+    });
+    svg.append(defs);
+
+    caixas.forEach(c => {
+      svg.append(s('rect', { class: 'modulo-box', x: c.x, y: c.y, width: NO_L + PAD, height: c.h, rx: 8 }));
+      const tx = s('text', { class: 'modulo-nome', x: c.x + PAD / 2, y: c.y + 17 });
+      tx.textContent = c.mod;
+      svg.append(tx);
+    });
+
+    const arestas = [];
+    estado.telas.forEach(t => {
+      t.conexoes.forEach(c => { if (pos[c.destino] && c.destino !== t.id) arestas.push({ de: t.id, para: c.destino, tipo: 'tela', texto: c.texto }); });
+      t.marcadores.forEach(m => { if (pos[m.destino] && m.destino !== t.id) arestas.push({ de: t.id, para: m.destino, tipo: 'marc', texto: m.titulo }); });
+    });
+    const gArestas = s('g');
+    svg.append(gArestas);
+    const ligados = new Set();
+    arestas.forEach(a => {
+      ligados.add(a.de); ligados.add(a.para);
+      const A = pos[a.de], B = pos[a.para];
+      let x1, x2, y1 = A.y + NO_A / 2, y2 = B.y + NO_A / 2, d;
+      if (Math.abs(A.x - B.x) < 5) {
+        // mesma coluna: curva pela direita
+        x1 = A.x + NO_L; x2 = B.x + NO_L;
+        const dx = 30 + Math.min(60, Math.abs(y2 - y1) / 4);
+        d = `M${x1},${y1} C${x1 + dx},${y1} ${x2 + dx},${y2} ${x2 + 2},${y2}`;
+      } else {
+        const direita = B.x > A.x;
+        x1 = direita ? A.x + NO_L : A.x;
+        x2 = direita ? B.x - 2 : B.x + NO_L + 2;
+        const dx = Math.max(40, Math.abs(x2 - x1) / 3) * (direita ? 1 : -1);
+        d = `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+      }
+      const p = s('path', { class: 'aresta' + (a.tipo === 'marc' ? ' marc' : ''), d, 'marker-end': `url(#${a.tipo === 'marc' ? 'setaMarc' : 'seta'})`, 'data-de': a.de, 'data-para': a.para });
+      const tt = s('title'); tt.textContent = `${nomeTela(tela(a.de))} → ${nomeTela(tela(a.para))}${a.texto ? '\n' + a.texto : ''}`;
+      p.append(tt);
+      gArestas.append(p);
+    });
+
+    Object.values(pos).forEach(({ x, y, t }) => {
+      const g = s('g', { class: 'no' + (ligados.has(t.id) ? '' : ' sem'), 'data-id': t.id, tabindex: 0 });
+      g.append(s('rect', { x, y, width: NO_L, height: NO_A, rx: 6 }));
+      const tx = s('text', { x: x + 8, y: y + NO_A / 2 + 4 });
+      tx.textContent = t.titulo.length > 26 ? t.titulo.slice(0, 25) + '…' : t.titulo;
+      g.append(tx);
+      const tt = s('title'); tt.textContent = nomeTela(t) + (ligados.has(t.id) ? '' : '\n(sem conexões)');
+      g.append(tt);
+      g.addEventListener('click', () => abrirTela(t.id));
+      g.addEventListener('keydown', e => { if (e.key === 'Enter') abrirTela(t.id); });
+      g.addEventListener('mouseenter', () => focar(t.id));
+      g.addEventListener('mouseleave', () => focar(null));
+      svg.append(g);
+    });
+
+    function focar(id) {
+      svg.classList.toggle('focando', !!id);
+      svg.querySelectorAll('.aresta').forEach(p => p.classList.toggle('foco', !!id && (p.dataset.de === id || p.dataset.para === id)));
+      const viz = new Set();
+      if (id) arestas.forEach(a => { if (a.de === id) viz.add(a.para); if (a.para === id) viz.add(a.de); });
+      svg.querySelectorAll('.no').forEach(n => {
+        n.classList.toggle('foco', n.dataset.id === id);
+        n.classList.toggle('vizinho', viz.has(n.dataset.id));
+      });
+    }
+  }
+
+  /* ---------- Exportação ---------- */
+  function baixar(nome, conteudo, tipo) {
+    const url = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
+    const a = el('a', { href: url, download: nome });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+  const dataHoje = () => new Date().toISOString().slice(0, 10);
+
+  async function paraDataUrl(caminho) {
+    const r = await fetch(caminho);
+    if (!r.ok) throw new Error(r.status);
+    const blob = await r.blob();
+    return await new Promise((ok, falha) => {
+      const fr = new FileReader();
+      fr.onload = () => ok(fr.result);
+      fr.onerror = falha;
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  async function gerarManual() {
+    aviso('Gerando manual…');
+    const dados = clone(estado);
+    let embutidas = 0, falhas = 0;
+    for (const t of dados.telas) {
+      if (t.imagem || !t.arquivo) continue;
+      try { t.imagem = await paraDataUrl(t.arquivo); embutidas++; }
+      catch (e) { falhas++; }
+    }
+    dados.telas.forEach(t => { delete t.revisada; });
+    const injecao = `<script>window.FRI_LEITURA=true;window.FRI_DADOS=${JSON.stringify(dados).replace(/</g, '\\u003c')};<\/script>\n`;
+    const pos = PAGINA_ORIGINAL.indexOf('<script>');
+    const html = '<!doctype html>\n' + PAGINA_ORIGINAL.slice(0, pos) + injecao + PAGINA_ORIGINAL.slice(pos);
+    baixar(`manual-interativo-fri-${dataHoje()}.html`, html, 'text/html');
+    if (falhas) {
+      aviso(`Manual gerado. ${falhas} print(s) não puderam ser embutidos: deixe o arquivo na mesma pasta da pasta "imagens".`);
+    } else {
+      aviso('Manual gerado com todos os prints embutidos.');
+    }
+  }
+
+  function exportarBackup() {
+    baixar(`anotacoes-fri-${dataHoje()}.json`, JSON.stringify(estado, null, 1), 'application/json');
+  }
+
+  $('#inBackup').addEventListener('change', async ev => {
+    const a = ev.target.files[0];
+    ev.target.value = '';
+    if (!a) return;
+    try {
+      const novo = JSON.parse(await a.text());
+      if (!novo || !Array.isArray(novo.telas)) throw new Error('formato');
+      if (!confirm('Substituir as anotações atuais pelas do arquivo?')) return;
+      estado = normalizar(mesclarComIniciais(novo));
+      salvar();
+      abrirTela(estado.telas[0]?.id);
+      aviso('Backup carregado.');
+    } catch (e) { aviso('Arquivo inválido.'); }
+  });
+
+  /* ---------- Eventos da interface ---------- */
+  function definirModo(m) {
+    modo = m;
+    marcSel = null;
+    fecharBalao();
+    $('#btModoEditar').classList.toggle('on', m === 'editar');
+    $('#btModoApresentar').classList.toggle('on', m === 'apresentar');
+    renderTela();
+  }
+  $('#btModoEditar').onclick = () => definirModo('editar');
+  $('#btModoApresentar').onclick = () => definirModo('apresentar');
+  $('#btVistaTela').onclick = () => mostrarVista('tela');
+  $('#btVistaMapa').onclick = () => mostrarVista('mapa');
+  $('#btAnterior').onclick = () => navegar(-1);
+  $('#btProxima').onclick = () => navegar(1);
+  $('#busca').addEventListener('input', renderLista);
+  function aplicarZoom() {
+    const z = +$('#zoom').value, q = $('#quadro');
+    fecharBalao();
+    q.classList.toggle('ampliado', z > 1);
+    q.style.width = z > 1 ? ($('#palco').clientWidth - 32) * z + 'px' : '';
+  }
+  $('#zoom').addEventListener('change', aplicarZoom);
+  window.addEventListener('hashchange', () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (id !== atualId && tela(id)) abrirTela(id);
+  });
+  $('#btAdicionar').onclick = () => $('#inArquivosImg').click();
+  $('#btArquivo').onclick = ev => { ev.stopPropagation(); $('#menuArquivo').classList.toggle('hidden'); };
+  document.addEventListener('click', () => $('#menuArquivo').classList.add('hidden'));
+  $('#menuArquivo').addEventListener('click', ev => {
+    const acao = ev.target.closest('button')?.dataset.acao;
+    if (acao === 'manual') gerarManual();
+    if (acao === 'exportar') exportarBackup();
+    if (acao === 'importar') $('#inBackup').click();
+    if (acao === 'restaurar' && confirm('Apagar todas as anotações e voltar aos dados iniciais do manual?')) {
+      estado = normalizar(estadoInicial());
+      salvar();
+      abrirTela(estado.telas[0].id);
+    }
+  });
+  document.addEventListener('keydown', ev => {
+    if (ev.target.closest('input, textarea, select')) return;
+    if ($('#vistaTela').classList.contains('hidden')) return;
+    if (ev.key === 'ArrowLeft') navegar(-1);
+    if (ev.key === 'ArrowRight') navegar(1);
+    if (ev.key === 'Escape') { fecharBalao(); if (marcSel) { marcSel = null; renderMarcadores(); renderPainel(); } }
+    if ((ev.key === 'Delete' || ev.key === 'Backspace') && modo === 'editar' && marcSel) {
+      const t = atual();
+      t.marcadores = t.marcadores.filter(m => m.id !== marcSel);
+      marcSel = null; salvar(); renderMarcadores(); renderPainel(); renderLista();
+    }
+  });
+  window.addEventListener('resize', () => { aplicarZoom(); if (!$('#vistaMapa').classList.contains('hidden')) renderMapa(); fecharBalao(); });
+
+  /* ---------- Início ---------- */
+  (async () => {
+    if (LEITURA) {
+      document.body.classList.add('leitura');
+      $('#tituloApp').textContent = 'Manual interativo — Sistema FRI';
+      document.title = 'Manual Interativo FRI';
+      estado = normalizar(window.FRI_DADOS);
+    } else {
+      const salvo = await lerDb();
+      estado = normalizar(salvo ? mesclarComIniciais(salvo) : estadoInicial());
+    }
+    const inicial = decodeURIComponent(location.hash.slice(1));
+    abrirTela(tela(inicial) ? inicial : estado.telas[0]?.id);
+    definirModo(modo);
+  })();
+})();
+</script>
+</body>
+</html>
