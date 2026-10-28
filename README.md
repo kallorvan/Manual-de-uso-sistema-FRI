@@ -6,6 +6,19 @@ Sistema web de gestão operacional da **Tóliman Transportes**: motoristas, moni
 >
 > Pontos ainda não confirmados estão listados em [PERGUNTAS.md](PERGUNTAS.md).
 
+## Anotador de telas (para o instrutor)
+
+O arquivo [anotador.html](anotador.html) é uma aplicação para o instrutor anotar os prints do sistema: o que cada tela significa e onde ela se conecta. Abra o arquivo no navegador (Chrome ou Edge) a partir desta pasta, para que os prints de `imagens/` apareçam. As telas já vêm com as descrições deste manual.
+
+- **Editar:** clique em um ponto do print para criar um marcador numerado e explicar aquele botão, campo ou indicador. O marcador pode **levar para outra tela**; nesse caso ele fica laranja.
+- **Sobre a tela:** módulo, nome, "O que esta tela significa", dica do instrutor e a marcação **Tela revisada**, que alimenta a barra de progresso.
+- **Onde esta tela se conecta:** conexões com outras telas ("Leva para") e, automaticamente, as telas que apontam para ela ("Chegam aqui").
+- **Apresentar:** mostra como o aluno vai ver. Os números abrem um balão com a explicação e o botão para ir à tela ligada.
+- **Mapa de conexões:** todas as telas agrupadas por módulo, com as ligações entre elas. Clique em uma tela para abri-la.
+- **+ Adicionar prints:** inclui novos prints. Também dá para trocar o print de uma tela.
+- **Arquivo › Gerar manual interativo:** gera um único arquivo HTML, só de leitura, com os prints embutidos, para entregar aos alunos.
+- **Arquivo › Salvar backup / Abrir backup:** as anotações ficam salvas no próprio navegador. Salve um backup em JSON para não perdê-las e para passar o trabalho para outro computador.
+
 ## Sumário
 
 1. [Acesso e tela inicial](#1-acesso-e-tela-inicial)
