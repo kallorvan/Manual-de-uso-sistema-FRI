@@ -38,8 +38,7 @@ O arquivo [anotador.html](anotador.html) é uma aplicação para o instrutor ano
 15. [HelpDesk](#15-helpdesk)
 16. [Updates Version](#16-updates-version)
 17. [Console](#17-console)
-18. [Configurações](#18-configurações)
-19. [Problemas conhecidos](#19-problemas-conhecidos)
+18. [Problemas conhecidos](#18-problemas-conhecidos)
 
 ---
 
@@ -400,7 +399,7 @@ Cadastro dos prazos de SLA. Busca por Prioridade; **+ Novo** inclui um SLA.
 
 ### 15.4 Manual
 
-Deveria mostrar o manual do HelpDesk, mas a página retorna erro. Veja [Problemas conhecidos](#19-problemas-conhecidos).
+Deveria mostrar o manual do HelpDesk, mas a página retorna erro. Veja [Problemas conhecidos](#18-problemas-conhecidos).
 
 ![HelpDesk > Manual](imagens/35-helpdesk-manual.jpg)
 
@@ -461,17 +460,11 @@ Console de banco de dados para consulta, exploração de objetos e execução de
 3. Navegue pelos objetos em **Objetos do Banco** (botão **Atualizar** recarrega a lista).
 4. Use **Janela SQL** para executar comandos.
 
-## 18. Configurações
-
-Acessada pelo menu do usuário (canto superior direito). A página retorna erro no momento. Veja [Problemas conhecidos](#19-problemas-conhecidos). Abaixo dela fica o painel **Meus dados**, com o nome e o CPF do usuário.
-
-![Configurações](imagens/44-configuracoes.jpg)
-
-## 19. Problemas conhecidos
+## 18. Problemas conhecidos
 
 | Tela | Erro | Detalhe |
 |---|---|---|
 | HelpDesk > Manual | Server Error — *Parser Error* | O arquivo `manualhelpdesk.aspx.cs` não existe no servidor. |
-| Configurações | Server Error — HTTP 404 *The resource cannot be found* | A página de configurações não foi encontrada no servidor. |
+| Configurações (menu do usuário, no canto superior direito) | Server Error — HTTP 404 *The resource cannot be found* | A página de configurações não foi encontrada no servidor. Por isso a tela não tem seção própria neste manual. |
 
 Essas telas devem ser corrigidas pela equipe de desenvolvimento.
