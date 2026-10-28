@@ -1,0 +1,1201 @@
+<title>Manual FRI Colaborativo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: barra de comando azul-marinho no topo; três colunas (índice de telas · print anotado · painel da tela); empilha no celular. */
+:root {
+  --bg: #eef1f5;
+  --surface: #ffffff;
+  --surface-2: #f5f7fa;
+  --line: #d5dce6;
+  --ink: #17222f;
+  --muted: #5a6778;
+  --navy: #16325c;
+  --navy-ink: #ffffff;
+  --info: #2257b8;
+  --info-soft: #e6eefb;
+  --link: #d4700c;
+  --link-soft: #fdf0e1;
+  --pend: #8a5a00;
+  --pend-soft: #fff4d6;
+  --ok: #24753a;
+  --ok-soft: #e3f3e7;
+  --del: #b42318;
+  --del-soft: #fde8e6;
+  --sel: #f2c230;
+  --shadow: 0 1px 2px rgba(18, 34, 58, .08), 0 6px 16px rgba(18, 34, 58, .07);
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151d; --surface: #17202b; --surface-2: #1d2835; --line: #2c3a4b;
+    --ink: #e4e9f0; --muted: #9aa8b9; --navy: #0b1a30; --navy-ink: #e8eef7;
+    --info: #6f9dee; --info-soft: #1c2c47; --link: #f0953a; --link-soft: #3a2614;
+    --pend: #f0c35a; --pend-soft: #3a2f12; --ok: #6cc785; --ok-soft: #173322;
+    --del: #f2867a; --del-soft: #3c1a17; --sel: #f2c230;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151d; --surface: #17202b; --surface-2: #1d2835; --line: #2c3a4b;
+  --ink: #e4e9f0; --muted: #9aa8b9; --navy: #0b1a30; --navy-ink: #e8eef7;
+  --info: #6f9dee; --info-soft: #1c2c47; --link: #f0953a; --link-soft: #3a2614;
+  --pend: #f0c35a; --pend-soft: #3a2f12; --ok: #6cc785; --ok-soft: #173322;
+  --del: #f2867a; --del-soft: #3c1a17; --sel: #f2c230;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 14px/1.5 var(--f-body);
+  display: flex; flex-direction: column;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--navy); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button {
+  cursor: pointer; border: 1px solid var(--line); background: var(--surface);
+  border-radius: var(--r); padding: 6px 12px;
+}
+button:hover { background: var(--surface-2); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+button.prim { background: var(--info); border-color: var(--info); color: var(--surface); font-weight: 600; }
+button.prim:hover { filter: brightness(1.08); }
+button.perigo { color: var(--del); }
+button.texto { border: 0; background: none; padding: 0; color: var(--info); text-align: left; }
+button.texto:hover { text-decoration: underline; }
+button:disabled { opacity: .5; cursor: default; }
+input[type=text], input[type=search], select, textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: var(--r);
+  padding: 6px 8px; background: var(--surface);
+}
+textarea { resize: vertical; min-height: 64px; line-height: 1.45; }
+.campo { display: grid; gap: 3px; }
+.campo > span { font-size: 12px; font-weight: 600; color: var(--muted); }
+.mono { font-family: var(--f-mono); font-size: 12px; }
+
+/* Barra de comando */
+.topo {
+  background: var(--navy); color: var(--navy-ink);
+  display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap;
+  padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+}
+.marca { display: flex; flex-direction: column; line-height: 1.1; margin-right: 6px; }
+.marca strong { font-family: var(--f-display); font-size: 17px; letter-spacing: .01em; }
+.marca small { font-size: 11px; opacity: .75; letter-spacing: .06em; text-transform: uppercase; }
+.topo button { background: transparent; border-color: color-mix(in srgb, var(--navy-ink) 30%, transparent); color: var(--navy-ink); }
+.topo button:hover { background: color-mix(in srgb, var(--navy-ink) 12%, transparent); }
+.seg { display: inline-flex; border: 1px solid color-mix(in srgb, var(--navy-ink) 30%, transparent); border-radius: var(--r); overflow: hidden; }
+.seg button { border: 0; border-radius: 0; }
+.seg button[aria-pressed="true"] { background: var(--navy-ink); color: var(--navy); font-weight: 600; }
+.topo .espaco { flex: 1; }
+.contador { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; padding: 0 6px; height: 18px; border-radius: 9px; background: var(--pend-soft); color: var(--pend); font-size: 11px; font-weight: 700; margin-left: 6px; }
+.eu { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; opacity: .9; }
+.eu img { width: 22px; height: 22px; border-radius: 50%; }
+#estadoSalvar { font-size: 12px; opacity: .85; min-width: 70px; }
+
+/* Avisos */
+.faixa { padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); font-size: 13px; background: var(--pend-soft); color: var(--ink); border-bottom: 1px solid var(--line); }
+
+/* Três colunas */
+.area { flex: 1; display: flex; min-height: 0; }
+.indice { width: 260px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.indice-topo { padding: 10px 12px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+.progresso { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+.trilho { height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.trilho > i { display: block; height: 100%; background: var(--ok); }
+#listaTelas { overflow-y: auto; flex: 1; padding-bottom: 16px; }
+.grupo { font-family: var(--f-display); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; padding: 12px 12px 4px; }
+.item {
+  display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 6px;
+  width: 100%; border: 0; border-radius: 0; background: none; text-align: left;
+  padding: 5px 12px; border-left: 3px solid transparent;
+}
+.item:hover { background: var(--surface-2); }
+.item[aria-current="true"] { background: var(--info-soft); border-left-color: var(--info); }
+.item .nome { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .ok { color: var(--ok); font-weight: 700; font-size: 12px; }
+.item .meta { font-size: 11px; color: var(--muted); white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+.ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--pend); display: inline-block; }
+
+main { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.cab-tela { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.cab-tela .titulo { flex: 1; min-width: 0; }
+.cab-tela small { display: block; color: var(--muted); font-size: 12px; }
+.cab-tela h1 { font-family: var(--f-display); font-size: 19px; margin: 0; font-weight: 600; text-wrap: balance; }
+.cab-tela select { width: auto; }
+.ajuda { font-size: 12px; color: var(--muted); padding: 6px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line); display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.leg { display: inline-flex; align-items: center; gap: 5px; }
+.leg i { width: 11px; height: 11px; border-radius: 50%; background: var(--info); display: inline-block; }
+.leg i.liga { background: var(--link); }
+.palco { flex: 1; overflow: auto; padding: 16px; }
+.quadro { position: relative; display: inline-block; max-width: 100%; box-shadow: var(--shadow); background: var(--surface); line-height: 0; border-radius: 2px; }
+.quadro img { max-width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
+.quadro.ampliado, .quadro.ampliado img { max-width: none; }
+.quadro.ampliado img { width: 100%; }
+.quadro.editando img { cursor: crosshair; }
+.sem-print { width: min(720px, 100%); aspect-ratio: 16 / 9; display: grid; place-items: center; color: var(--muted); line-height: 1.5; background: var(--surface-2); text-align: center; padding: 16px; }
+.pino {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 28px; height: 28px; border-radius: 50%; padding: 0;
+  background: var(--info); color: #fff; border: 2px solid #fff;
+  font: 700 13px/24px var(--f-display); text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.45); cursor: pointer; touch-action: none;
+}
+.pino:hover { background: var(--info); filter: brightness(1.12); }
+.pino.liga, .pino.liga:hover { background: var(--link); }
+.pino.sel { outline: 3px solid var(--sel); outline-offset: 1px; }
+.balao {
+  position: absolute; z-index: 4; width: 300px; max-width: 80vw;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: var(--shadow); padding: 12px 14px; line-height: 1.5;
+}
+.balao h4 { margin: 0 24px 6px 0; font-family: var(--f-display); font-size: 15px; font-weight: 600; }
+.balao .fechar { position: absolute; top: 6px; right: 6px; border: 0; background: none; font-size: 18px; padding: 0 6px; line-height: 1.2; }
+.balao .ir { margin-top: 10px; }
+
+.painel { width: 360px; flex-shrink: 0; overflow-y: auto; background: var(--surface); border-left: 1px solid var(--line); padding: 4px 16px 32px; }
+.secao { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+.secao:last-child { border-bottom: 0; }
+.secao h2 { font-family: var(--f-display); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.secao h2 button { margin-left: auto; text-transform: none; letter-spacing: 0; font: 12px var(--f-body); padding: 3px 8px; }
+.texto-rico p { margin: 0 0 8px; }
+.texto-rico p:last-child { margin-bottom: 0; }
+.texto-rico ul { margin: 0 0 8px; padding-left: 18px; }
+.vazio { color: var(--muted); font-style: italic; margin: 0; }
+.assinatura { font-size: 12px; color: var(--muted); }
+.lista-pinos { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.lista-pinos li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; padding: 6px; border-radius: var(--r); cursor: pointer; }
+.lista-pinos li:hover { background: var(--surface-2); }
+.lista-pinos li.sel { background: var(--pend-soft); }
+.num { width: 22px; height: 22px; border-radius: 50%; background: var(--info); color: #fff; font: 700 12px/22px var(--f-display); text-align: center; }
+.num.liga { background: var(--link); }
+.lista-pinos small { display: block; color: var(--muted); }
+.editor { background: var(--pend-soft); border: 1px solid color-mix(in srgb, var(--pend) 35%, transparent); border-radius: var(--r); padding: 12px; display: grid; gap: 10px; }
+.editor .cab { font-weight: 600; }
+.botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.conexao { border: 1px solid var(--line); border-radius: var(--r); padding: 8px; background: var(--surface-2); display: grid; gap: 6px; }
+.conexao .linha { display: flex; gap: 6px; align-items: center; }
+.conexao .linha select { flex: 1; min-width: 0; }
+.ligacao { display: grid; grid-template-columns: 14px 1fr; gap: 6px; align-items: baseline; }
+.ligacao .seta { color: var(--muted); }
+.ligacao small { display: block; color: var(--muted); }
+.etq { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 9px; background: var(--link-soft); color: var(--link); margin-left: 4px; font-weight: 600; }
+.sub { font-weight: 600; font-size: 13px; }
+.check { display: flex; gap: 8px; align-items: center; }
+
+/* Mapa */
+#vistaMapa, #vistaHist { flex: 1; overflow: auto; }
+.barra-vista { position: sticky; left: 0; top: 0; z-index: 2; background: var(--surface); border-bottom: 1px solid var(--line); padding: 10px 16px; display: flex; gap: 10px 18px; align-items: center; flex-wrap: wrap; }
+.barra-vista h1 { font-family: var(--f-display); font-size: 18px; margin: 0; font-weight: 600; }
+#mapaSvg { display: block; }
+#mapaSvg .caixa { fill: var(--surface); stroke: var(--line); }
+#mapaSvg .rotulo { font: 600 11px var(--f-display); fill: var(--muted); letter-spacing: .06em; }
+#mapaSvg .no rect { fill: var(--surface-2); stroke: var(--line); }
+#mapaSvg .no text { font: 12px var(--f-body); fill: var(--ink); pointer-events: none; }
+#mapaSvg .no { cursor: pointer; }
+#mapaSvg .no:hover rect, #mapaSvg .no.foco rect { fill: var(--info-soft); stroke: var(--info); }
+#mapaSvg .no.sem rect { stroke-dasharray: 3 3; }
+#mapaSvg .aresta { fill: none; stroke: var(--muted); stroke-width: 1.5; opacity: .55; }
+#mapaSvg .aresta.marc { stroke: var(--link); stroke-dasharray: 5 4; }
+#mapaSvg .aresta.foco { opacity: 1; stroke-width: 2.5; }
+#mapaSvg.focando .aresta:not(.foco) { opacity: .07; }
+#mapaSvg.focando .no:not(.foco):not(.viz) { opacity: .35; }
+.seta-cinza { fill: var(--muted); }
+.seta-laranja { fill: var(--link); }
+
+/* Histórico */
+.hist-filtros { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.hist-filtros select { width: auto; max-width: 220px; }
+.hist-lista { padding: 12px 16px 40px; display: grid; gap: 10px; max-width: 980px; }
+.registro { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; border-left: 4px solid var(--pend); }
+.registro.conferido { border-left-color: var(--ok); }
+.registro .linha1 { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.registro .quem { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.registro .quem img { width: 22px; height: 22px; border-radius: 50%; }
+.registro .quando { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.registro .estado { margin-left: auto; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9px; background: var(--pend-soft); color: var(--pend); text-transform: uppercase; letter-spacing: .05em; }
+.registro.conferido .estado { background: var(--ok-soft); color: var(--ok); }
+.diff { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.diff > div { border-radius: var(--r); padding: 8px 10px; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+.diff .antes { background: var(--del-soft); }
+.diff .depois { background: var(--ok-soft); }
+.diff b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 2px; }
+
+/* Diálogo e aviso */
+.fundo { position: fixed; inset: 0; background: rgba(10, 18, 30, .45); display: grid; place-items: center; z-index: 20; padding: 16px; }
+.dialogo { background: var(--surface); border-radius: 8px; box-shadow: var(--shadow); padding: 18px; width: min(420px, 100%); display: grid; gap: 14px; }
+.dialogo p { margin: 0; }
+.toast { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--navy); color: var(--navy-ink); padding: 10px 16px; border-radius: var(--r); box-shadow: var(--shadow); z-index: 30; max-width: calc(100vw - 32px); }
+.carregando { padding: 40px 16px; color: var(--muted); text-align: center; }
+
+@media (max-width: 1000px) {
+  .area { flex-direction: column; overflow-y: auto; }
+  .indice { width: auto; max-height: 230px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .painel { width: auto; border-left: 0; border-top: 1px solid var(--line); overflow: visible; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  main { min-height: 65vh; }
+  .diff { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<header class="topo">
+  <div class="marca"><strong>Manual FRI</strong><small>Tóliman · edição colaborativa</small></div>
+  <div class="seg" role="group" aria-label="Vista">
+    <button id="btTelas" aria-pressed="true">Telas</button>
+    <button id="btMapa" aria-pressed="false">Mapa</button>
+    <button id="btHist" aria-pressed="false">Histórico<span id="contPend" class="contador" hidden>0</span></button>
+  </div>
+  <div class="seg" role="group" aria-label="Modo" id="grupoModo" hidden>
+    <button id="btEditar" aria-pressed="true">Editar</button>
+    <button id="btApresentar" aria-pressed="false">Apresentar</button>
+  </div>
+  <span class="espaco"></span>
+  <span id="estadoSalvar" aria-live="polite"></span>
+  <button id="btAdicionar" hidden>+ Adicionar prints</button>
+  <button id="btExportar" hidden>Exportar dados</button>
+  <span class="eu" id="eu"></span>
+  <input id="inPrints" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+  <input id="inTrocar" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+</header>
+<div class="faixa" id="faixa" hidden></div>
+
+<div class="area" id="vistaTelas">
+  <aside class="indice" aria-label="Telas do sistema">
+    <div class="indice-topo">
+      <input id="busca" type="search" placeholder="Buscar tela…" aria-label="Buscar tela">
+      <div class="progresso"><span id="txtProgresso">Carregando…</span><div class="trilho"><i id="barraProgresso" style="width:0"></i></div></div>
+    </div>
+    <nav id="listaTelas"></nav>
+  </aside>
+  <main>
+    <div class="cab-tela">
+      <button id="btAnt" title="Tela anterior (←)" aria-label="Tela anterior">◀</button>
+      <div class="titulo"><small id="cabModulo">Sistema FRI</small><h1 id="cabTitulo">Carregando telas…</h1></div>
+      <select id="zoom" aria-label="Tamanho do print"><option value="1">Ajustar</option><option value="1.5">150%</option><option value="2">200%</option></select>
+      <button id="btProx" title="Próxima tela (→)" aria-label="Próxima tela">▶</button>
+    </div>
+    <div class="ajuda" id="ajuda"></div>
+    <div class="palco" id="palco">
+      <div class="quadro" id="quadro"><div class="carregando" id="carregando">As telas do manual aparecem aqui assim que o banco responder.</div></div>
+    </div>
+  </main>
+  <aside class="painel" id="painel" aria-label="Informações da tela"></aside>
+</div>
+
+<div id="vistaMapa" hidden>
+  <div class="barra-vista">
+    <h1>Mapa de conexões</h1>
+    <span class="leg"><svg width="26" height="8" aria-hidden="true"><line x1="0" y1="4" x2="26" y2="4" stroke="currentColor" stroke-width="2"/></svg> conexão da tela</span>
+    <span class="leg" style="color:var(--link)"><svg width="26" height="8" aria-hidden="true"><line x1="0" y1="4" x2="26" y2="4" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/></svg> marcador que leva a outra tela</span>
+    <span class="leg">Passe o mouse para destacar. Clique para abrir.</span>
+  </div>
+  <div style="overflow-x:auto"><svg id="mapaSvg" role="img" aria-label="Mapa de conexões entre as telas"></svg></div>
+</div>
+
+<div id="vistaHist" hidden>
+  <div class="barra-vista">
+    <h1>Histórico de alterações</h1>
+    <div class="hist-filtros">
+      <select id="fEstado" aria-label="Situação"><option value="pend">Não conferidas</option><option value="todas">Todas</option></select>
+      <select id="fPessoa" aria-label="Pessoa"><option value="">Todas as pessoas</option></select>
+      <select id="fTela" aria-label="Tela"><option value="">Todas as telas</option></select>
+      <button id="btConferirTodas" hidden>Conferir as listadas</button>
+    </div>
+  </div>
+  <div class="hist-lista" id="histLista"></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, el = document) => el.querySelector(s);
+  const h = (tag, attrs = {}, ...filhos) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') n.className = v;
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) n.setAttribute(k, v === true ? '' : v);
+    }
+    for (const f of filhos.flat()) if (f != null && f !== false) n.append(f.nodeType ? f : document.createTextNode(String(f)));
+    return n;
+  };
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const agora = () => new Date().toISOString();
+
+  /* ---------- Estado ---------- */
+  const st = {
+    db: null, user: null, assets: null, downloads: null,
+    eu: null, podeEscrever: true, admin: false, dono: false,
+    telas: new Map(), marc: new Map(), conex: new Map(), hist: [], conf: new Map(),
+    carregou: false, atualId: null, marcSel: null, modo: 'editar', vista: 'telas',
+    perfis: {}, painelSujo: false,
+  };
+  const CAMPOS_TELA = { modulo: 'Módulo', titulo: 'Nome da tela', descricao: 'O que esta tela significa', dica: 'Dica do instrutor', revisada: 'Tela revisada' };
+  const CAMPOS_MARC = { titulo: 'Título do marcador', texto: 'Explicação do marcador', destino: 'Tela de destino' };
+  const CAMPOS_CONEX = { destino: 'Tela de destino', texto: 'Descrição da conexão' };
+
+  const telasOrdenadas = () => [...st.telas.values()].sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0) || a.id.localeCompare(b.id));
+  const modulos = () => { const m = []; telasOrdenadas().forEach(t => { if (!m.includes(t.modulo)) m.push(t.modulo); }); return m; };
+  const tela = id => st.telas.get(id);
+  const atual = () => tela(st.atualId);
+  const nomeTela = t => t ? (t.modulo && t.modulo !== 'Geral' ? `${t.modulo} › ${t.titulo}` : t.titulo) : '(tela removida)';
+  const marcadoresDe = id => [...st.marc.values()].filter(m => m.tela === id).sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
+  const conexoesDe = id => [...st.conex.values()].filter(c => c.origem === id).sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
+  const srcPrint = t => t.imagem ? '/_blob/' + t.imagem : '';
+  const pendentes = () => st.hist.filter(r => !st.conf.has(r.id));
+  const editando = () => st.modo === 'editar' && st.podeEscrever;
+
+  /* ---------- Avisos ---------- */
+  function aviso(msg) {
+    const t = h('div', { class: 'toast', role: 'status' }, msg);
+    document.body.append(t);
+    setTimeout(() => t.remove(), 3800);
+  }
+  function perguntar(texto, rotulo = 'Confirmar') {
+    return new Promise(ok => {
+      const fechar = v => { f.remove(); ok(v); };
+      const f = h('div', { class: 'fundo', onclick: e => { if (e.target === f) fechar(false); } },
+        h('div', { class: 'dialogo', role: 'dialog', 'aria-modal': 'true' },
+          h('p', {}, texto),
+          h('div', { class: 'botoes' },
+            h('button', { class: 'prim', onclick: () => fechar(true) }, rotulo),
+            h('button', { onclick: () => fechar(false) }, 'Cancelar'))));
+      document.body.append(f);
+      f.querySelector('.prim').focus();
+    });
+  }
+  let pendentesSalvar = 0;
+  function marcarSalvando(d) {
+    pendentesSalvar += d;
+    $('#estadoSalvar').textContent = pendentesSalvar > 0 ? 'Salvando…' : 'Salvo ✓';
+  }
+  function erroEscrita(e) {
+    console.warn(e);
+    if (e?.code === 'invalid_argument' && st.podeEscrever) {
+      st.podeEscrever = false;
+      mostrarFaixa('Você pode ver o manual, mas não editar. Peça ao dono acesso de Colaborador.');
+      definirModo('apresentar');
+    } else if (e?.code === 'quota_exceeded') aviso('O espaço do banco acabou. Avise o dono do manual.');
+    else aviso('Não foi possível salvar. Verifique a conexão e tente de novo.');
+  }
+  async function escrever(fn) {
+    marcarSalvando(1);
+    try { await fn(); } catch (e) { erroEscrita(e); } finally { marcarSalvando(-1); }
+  }
+  function mostrarFaixa(txt) { const f = $('#faixa'); f.textContent = txt; f.hidden = !txt; }
+
+  /* ---------- Histórico (registro de alterações) ---------- */
+  function registrar(r) {
+    if (!st.db) return Promise.resolve();
+    return st.db.collection('historico').doc(uid()).set({ ...r, autor: st.eu, em: agora() });
+  }
+
+  /* ---------- Texto formatado ---------- */
+  const escapar = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function formatar(txt) {
+    const linhas = escapar(txt || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').split('\n');
+    let out = '', lista = false, par = [];
+    const fechaPar = () => { if (par.length) { out += `<p>${par.join('<br>')}</p>`; par = []; } };
+    for (const l of linhas) {
+      const it = l.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)/);
+      if (it) { fechaPar(); if (!lista) { out += '<ul>'; lista = true; } out += `<li>${it[1]}</li>`; }
+      else { if (lista) { out += '</ul>'; lista = false; } if (l.trim() === '') fechaPar(); else par.push(l); }
+    }
+    fechaPar(); if (lista) out += '</ul>';
+    return out;
+  }
+  function blocoTexto(txt, vazio) {
+    const d = h('div', { class: 'texto-rico' });
+    if (txt && String(txt).trim()) d.innerHTML = formatar(txt); else d.append(h('p', { class: 'vazio' }, vazio));
+    return d;
+  }
+  function quando(iso) {
+    if (!iso) return '';
+    const d = new Date(iso), s = (Date.now() - d) / 1000;
+    if (s < 60) return 'agora há pouco';
+    if (s < 3600) return `há ${Math.floor(s / 60)} min`;
+    if (s < 86400) return `há ${Math.floor(s / 3600)} h`;
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+  async function resolverPerfis(ids) {
+    const lista = [...new Set(ids.filter(Boolean))];
+    if (!st.user || !lista.length) return;
+    try { Object.assign(st.perfis, await st.user.profiles(lista)); } catch (e) {}
+  }
+  const nomePessoa = id => (id && st.perfis[id]?.name) || (id && id === st.eu ? 'Você' : 'Alguém');
+
+  /* ---------- Índice de telas ---------- */
+  function renderIndice() {
+    const filtro = $('#busca').value.trim().toLowerCase();
+    const nav = $('#listaTelas');
+    nav.innerHTML = '';
+    const pendPorTela = new Set(pendentes().map(r => r.tela));
+    for (const mod of modulos()) {
+      const ts = telasOrdenadas().filter(t => t.modulo === mod && (!filtro || `${t.titulo} ${t.modulo} ${t.descricao || ''}`.toLowerCase().includes(filtro)));
+      if (!ts.length) continue;
+      nav.append(h('div', { class: 'grupo' }, mod));
+      for (const t of ts) {
+        const nM = marcadoresDe(t.id).length;
+        nav.append(h('button', {
+          class: 'item', title: nomeTela(t), 'aria-current': t.id === st.atualId ? 'true' : 'false',
+          onclick: () => irPara(t.id)
+        },
+          h('span', { class: 'ok', 'aria-label': t.revisada ? 'revisada' : null }, t.revisada ? '✓' : ''),
+          h('span', { class: 'nome' }, t.titulo),
+          h('span', { class: 'meta' }, nM ? `● ${nM}` : '', pendPorTela.has(t.id) ? h('span', { class: 'ponto', title: 'Tem alterações não conferidas' }) : null)
+        ));
+      }
+    }
+    if (!st.telas.size && st.carregou) nav.append(h('p', { class: 'vazio', style: 'padding:12px' }, 'Nenhuma tela cadastrada ainda. Use “+ Adicionar prints”.'));
+    const total = st.telas.size, rev = [...st.telas.values()].filter(t => t.revisada).length;
+    $('#txtProgresso').textContent = st.carregou ? `${rev} de ${total} telas revisadas` : 'Carregando…';
+    $('#barraProgresso').style.width = total ? (100 * rev / total) + '%' : '0';
+    nav.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
+    const np = pendentes().length;
+    $('#contPend').hidden = !np; $('#contPend').textContent = np;
+  }
+
+  /* ---------- Tela atual ---------- */
+  function irPara(id, idMarcador = null) {
+    if (!tela(id)) return;
+    st.atualId = id; st.marcSel = idMarcador; st.painelSujo = false;
+    mostrarVista('telas', false);
+    try { history.replaceState(null, '', '#' + id); } catch (e) {}
+    fecharBalao(); renderIndice(); renderTela();
+    $('#palco').scrollTop = 0;
+    if (idMarcador && st.modo === 'apresentar') requestAnimationFrame(() => abrirBalao(idMarcador));
+  }
+
+  function renderTela() {
+    const t = atual();
+    const q = $('#quadro');
+    if (!t) {
+      $('#cabTitulo').textContent = st.carregou ? 'Nenhuma tela' : 'Carregando telas…';
+      $('#painel').innerHTML = '';
+      return;
+    }
+    $('#cabModulo').textContent = t.modulo === 'Geral' ? 'Sistema FRI' : t.modulo;
+    $('#cabTitulo').textContent = t.titulo;
+    $('#carregando')?.remove();
+    let img = $('#imgTela');
+    const src = srcPrint(t);
+    q.querySelector('.sem-print')?.remove();
+    if (src) {
+      if (!img) { img = h('img', { id: 'imgTela', alt: '' }); img.addEventListener('click', cliqueNoPrint); q.prepend(img); }
+      if (img.getAttribute('src') !== src) img.src = src;
+      img.alt = 'Print: ' + nomeTela(t);
+    } else {
+      img?.remove();
+      q.prepend(h('div', { class: 'sem-print' }, 'Esta tela ainda não tem print. Quem pode editar o manual pode usar “Trocar print”.'));
+    }
+    q.classList.toggle('editando', editando());
+    const aj = $('#ajuda'); aj.innerHTML = '';
+    if (editando()) aj.append(h('span', {}, h('strong', {}, 'Editando: '), 'clique no print para criar um marcador, arraste para mover, use ← → para trocar de tela.'));
+    else aj.append(h('span', { class: 'leg' }, h('i'), 'explica um item'), h('span', { class: 'leg' }, h('i', { class: 'liga' }), 'leva para outra tela'), h('span', {}, 'Clique nos números para ver a explicação.'));
+    renderPinos();
+    renderPainel();
+  }
+
+  function renderPinos() {
+    const q = $('#quadro');
+    q.querySelectorAll('.pino').forEach(p => p.remove());
+    marcadoresDe(st.atualId).forEach((m, i) => {
+      const b = h('button', {
+        class: 'pino' + (m.destino ? ' liga' : '') + (m.id === st.marcSel ? ' sel' : ''),
+        style: `left:${m.x}%;top:${m.y}%`, title: m.titulo || `Marcador ${i + 1}`, 'data-id': m.id
+      }, String(i + 1));
+      b.addEventListener('pointerdown', ev => arrastar(ev, m, b));
+      q.append(b);
+    });
+  }
+  const marcarSel = () => $('#quadro').querySelectorAll('.pino').forEach(b => b.classList.toggle('sel', b.dataset.id === st.marcSel));
+
+  function posNoPrint(ev) {
+    const r = $('#imgTela').getBoundingClientRect();
+    return {
+      x: +Math.min(100, Math.max(0, (ev.clientX - r.left) / r.width * 100)).toFixed(2),
+      y: +Math.min(100, Math.max(0, (ev.clientY - r.top) / r.height * 100)).toFixed(2)
+    };
+  }
+  function arrastar(ev, m, b) {
+    ev.preventDefault(); ev.stopPropagation();
+    const x0 = ev.clientX, y0 = ev.clientY;
+    let moveu = false, pos = null;
+    b.setPointerCapture(ev.pointerId);
+    b.onpointermove = e => {
+      if (!editando()) return;
+      if (!moveu && Math.hypot(e.clientX - x0, e.clientY - y0) < 4) return;
+      moveu = true; pos = posNoPrint(e);
+      b.style.left = pos.x + '%'; b.style.top = pos.y + '%';
+    };
+    b.onpointerup = () => {
+      b.onpointermove = b.onpointerup = null;
+      if (moveu && pos) {
+        escrever(() => st.db.doc('marcadores/' + m.id).update({ x: pos.x, y: pos.y, atualizadoPor: st.eu, atualizadoEm: agora() }));
+        return;
+      }
+      if (editando()) selecionarMarcador(m.id); else abrirBalao(m.id);
+    };
+  }
+  function cliqueNoPrint(ev) {
+    if (!editando()) { fecharBalao(); return; }
+    const t = atual(), p = posNoPrint(ev), id = uid();
+    const novo = { tela: t.id, x: p.x, y: p.y, titulo: '', texto: '', destino: '', ordem: Date.now(), criadoPor: st.eu, atualizadoPor: st.eu, atualizadoEm: agora() };
+    st.marc.set(id, { id, ...novo });
+    st.marcSel = id;
+    renderPinos(); renderPainel(true); renderIndice();
+    escrever(async () => {
+      await st.db.doc('marcadores/' + id).set(novo);
+      await registrar({ tela: t.id, alvo: 'marcador', alvoId: id, acao: 'criou', depois: novo });
+    });
+  }
+  function selecionarMarcador(id) {
+    st.marcSel = id; marcarSel(); renderPainel(true);
+  }
+
+  /* ---------- Balão (apresentação) ---------- */
+  const fecharBalao = () => $('#quadro .balao')?.remove();
+  function abrirBalao(id) {
+    fecharBalao();
+    const lista = marcadoresDe(st.atualId), i = lista.findIndex(m => m.id === id);
+    if (i < 0) return;
+    const m = lista[i], dest = m.destino && tela(m.destino);
+    st.marcSel = id; marcarSel(); renderPainel();
+    const b = h('div', { class: 'balao', role: 'dialog', 'aria-label': m.titulo || 'Marcador' },
+      h('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: fecharBalao }, '×'),
+      h('h4', {}, `${i + 1}. ${m.titulo || 'Sem título'}`),
+      blocoTexto(m.texto, 'Sem explicação.'),
+      dest ? h('button', { class: 'prim ir', onclick: () => irPara(dest.id) }, `Ir para ${dest.titulo} →`) : null);
+    const q = $('#quadro'); q.append(b);
+    const L = q.clientWidth, A = q.clientHeight;
+    let left = m.x / 100 * L + 20, top = m.y / 100 * A - 10;
+    if (left + b.offsetWidth > L) left = Math.max(0, m.x / 100 * L - b.offsetWidth - 20);
+    if (top + b.offsetHeight > A) top = Math.max(0, A - b.offsetHeight);
+    b.style.left = left + 'px'; b.style.top = top + 'px';
+  }
+
+  /* ---------- Edição com histórico ---------- */
+  // Agrupa a digitação: salva 1,2 s depois da última tecla e registra uma única alteração com o valor de antes e o de depois.
+  const rascunhos = new Map();
+  function editarCampo(colecao, id, campo, valor, telaId) {
+    const chave = `${colecao}/${id}/${campo}`;
+    let r = rascunhos.get(chave);
+    if (!r) {
+      const doc = colecao === 'telas' ? st.telas.get(id) : colecao === 'marcadores' ? st.marc.get(id) : st.conex.get(id);
+      r = { antes: doc?.[campo] ?? '', timer: null };
+      rascunhos.set(chave, r);
+    }
+    r.valor = valor;
+    const local = colecao === 'telas' ? st.telas.get(id) : colecao === 'marcadores' ? st.marc.get(id) : st.conex.get(id);
+    if (local) local[campo] = valor;
+    clearTimeout(r.timer);
+    $('#estadoSalvar').textContent = 'Editando…';
+    r.timer = setTimeout(() => gravarCampo(chave, colecao, id, campo, telaId), 1200);
+  }
+  function gravarCampo(chave, colecao, id, campo, telaId) {
+    const r = rascunhos.get(chave);
+    if (!r) return;
+    rascunhos.delete(chave);
+    clearTimeout(r.timer);
+    if (r.valor === r.antes) { marcarSalvando(0); return; }
+    escrever(async () => {
+      await st.db.doc(`${colecao}/${id}`).update({ [campo]: r.valor, atualizadoPor: st.eu, atualizadoEm: agora() });
+      await registrar({ tela: telaId, alvo: colecao === 'telas' ? 'tela' : colecao === 'marcadores' ? 'marcador' : 'conexao', alvoId: id, acao: 'editou', campo, antes: r.antes, depois: r.valor });
+    });
+  }
+  function gravarTudo() {
+    for (const [chave, r] of [...rascunhos]) { clearTimeout(r.timer); r.timer = null; }
+    for (const chave of [...rascunhos.keys()]) {
+      const [colecao, id, campo] = chave.split('/');
+      const telaId = colecao === 'telas' ? id : (st.marc.get(id)?.tela || st.conex.get(id)?.origem);
+      gravarCampo(chave, colecao, id, campo, telaId);
+    }
+  }
+  window.addEventListener('pagehide', gravarTudo);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) gravarTudo(); });
+
+  function entrada(colecao, obj, campo, telaId, attrs = {}) {
+    const multi = !!attrs.linhas;
+    const n = multi ? h('textarea', { id: `${colecao}-${obj.id}-${campo}`, rows: attrs.linhas, placeholder: attrs.placeholder || '' })
+                    : h('input', { type: 'text', id: `${colecao}-${obj.id}-${campo}`, placeholder: attrs.placeholder || '', list: attrs.list || null });
+    n.value = obj[campo] || '';
+    n.addEventListener('input', () => { editarCampo(colecao, obj.id, campo, n.value, telaId); attrs.aoMudar?.(n.value); });
+    n.addEventListener('blur', () => { const k = `${colecao}/${obj.id}/${campo}`; if (rascunhos.has(k)) gravarCampo(k, colecao, obj.id, campo, telaId); });
+    return n;
+  }
+  const campo = (rotulo, ctrl) => h('label', { class: 'campo' }, h('span', {}, rotulo), ctrl);
+  function seletorTela(valor, excluir) {
+    const s = h('select');
+    s.append(h('option', { value: '' }, '— nenhuma —'));
+    for (const mod of modulos()) {
+      const g = h('optgroup', { label: mod });
+      telasOrdenadas().filter(t => t.modulo === mod && t.id !== excluir).forEach(t => g.append(h('option', { value: t.id, selected: t.id === valor }, t.titulo)));
+      s.append(g);
+    }
+    return s;
+  }
+
+  /* ---------- Painel lateral ---------- */
+  function renderPainel(forcar = false) {
+    const p = $('#painel');
+    if (!forcar && p.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { st.painelSujo = true; return; }
+    st.painelSujo = false;
+    const t = atual();
+    p.innerHTML = '';
+    if (!t) return;
+    if (editando()) painelEdicao(p, t); else painelLeitura(p, t);
+  }
+  $('#painel').addEventListener('focusout', () => setTimeout(() => {
+    if (st.painelSujo && !$('#painel').contains(document.activeElement)) renderPainel();
+  }, 0));
+
+  function assinatura(obj) {
+    if (!obj?.atualizadoEm) return null;
+    return h('div', { class: 'assinatura' }, `Última alteração: ${nomePessoa(obj.atualizadoPor)}, ${quando(obj.atualizadoEm)}`);
+  }
+
+  function painelLeitura(p, t) {
+    p.append(h('section', { class: 'secao' }, h('h2', {}, 'O que é esta tela'), blocoTexto(t.descricao, 'Sem descrição.')));
+    if (t.dica && t.dica.trim()) p.append(h('section', { class: 'secao' }, h('h2', {}, 'Dica do instrutor'), blocoTexto(t.dica, '')));
+    const s = h('section', { class: 'secao' }, h('h2', {}, 'Itens da tela'));
+    const ms = marcadoresDe(t.id);
+    s.append(ms.length ? listaPinos(ms, id => abrirBalao(id)) : h('p', { class: 'vazio' }, 'Nenhum item marcado.'));
+    p.append(s, secaoLigacoes(t, false));
+    const a = assinatura(t); if (a) p.append(h('section', { class: 'secao' }, a));
+  }
+
+  function listaPinos(ms, aoClicar) {
+    const ul = h('ul', { class: 'lista-pinos' });
+    ms.forEach((m, i) => {
+      const d = m.destino && tela(m.destino);
+      ul.append(h('li', { class: m.id === st.marcSel ? 'sel' : '', tabindex: 0, onclick: () => aoClicar(m.id), onkeydown: e => { if (e.key === 'Enter') aoClicar(m.id); } },
+        h('span', { class: 'num' + (m.destino ? ' liga' : '') }, String(i + 1)),
+        h('div', {}, m.titulo || h('span', { class: 'vazio' }, 'Sem título'), d ? h('small', {}, '→ leva para ' + d.titulo) : null)));
+    });
+    return ul;
+  }
+
+  function entradas(id) {
+    const out = [];
+    st.conex.forEach(c => { if (c.destino === id && c.origem !== id && tela(c.origem)) out.push({ origem: tela(c.origem), texto: c.texto }); });
+    st.marc.forEach(m => {
+      if (m.destino === id && m.tela !== id && tela(m.tela)) {
+        const n = marcadoresDe(m.tela).findIndex(x => x.id === m.id) + 1;
+        out.push({ origem: tela(m.tela), texto: m.titulo, num: n, marcador: m.id });
+      }
+    });
+    return out;
+  }
+  function itemLigacao(seta, alvo, texto, num, marcador) {
+    return h('div', { class: 'ligacao' }, h('span', { class: 'seta' }, seta),
+      h('div', {},
+        alvo ? h('button', { class: 'texto', onclick: () => irPara(alvo.id, marcador || null) }, nomeTela(alvo)) : h('span', { class: 'vazio' }, '(tela não escolhida)'),
+        num ? h('span', { class: 'etq' }, 'marcador ' + num) : null,
+        texto ? h('small', {}, texto) : null));
+  }
+
+  function secaoLigacoes(t, edicao) {
+    const s = h('section', { class: 'secao' }, h('h2', {}, 'Onde esta tela se conecta'));
+    const cs = conexoesDe(t.id);
+    const viaMarc = marcadoresDe(t.id).map((m, i) => ({ m, i })).filter(x => x.m.destino);
+    s.append(h('div', { class: 'sub' }, 'Leva para'));
+    if (edicao) {
+      s.querySelector('h2').append(h('button', { onclick: novaConexao }, '+ Conexão'));
+      if (!cs.length) s.append(h('p', { class: 'vazio' }, 'Nenhuma conexão. Use “+ Conexão” para dizer a qual tela esta leva ou qual ela alimenta.'));
+      cs.forEach(c => {
+        const sel = seletorTela(c.destino, t.id);
+        sel.id = `conexoes-${c.id}-destino`;
+        sel.addEventListener('change', () => {
+          const antes = c.destino; c.destino = sel.value;
+          escrever(async () => {
+            await st.db.doc('conexoes/' + c.id).update({ destino: sel.value, atualizadoPor: st.eu, atualizadoEm: agora() });
+            await registrar({ tela: t.id, alvo: 'conexao', alvoId: c.id, acao: 'editou', campo: 'destino', antes, depois: sel.value });
+          });
+        });
+        s.append(h('div', { class: 'conexao' },
+          h('div', { class: 'linha' }, sel,
+            h('button', { title: 'Abrir a tela de destino', 'aria-label': 'Abrir a tela de destino', onclick: () => c.destino && irPara(c.destino) }, '↗'),
+            h('button', { class: 'perigo', title: 'Remover conexão', 'aria-label': 'Remover conexão', onclick: () => removerConexao(c) }, '×')),
+          entrada('conexoes', c, 'texto', t.id, { linhas: 2, placeholder: 'Como se conectam? Ex.: o status cadastrado aqui aparece na outra tela.' })));
+      });
+      if (viaMarc.length) s.append(h('small', { class: 'assinatura' }, 'Pelos marcadores:'));
+      viaMarc.forEach(({ m, i }) => s.append(itemLigacao('→', tela(m.destino), m.titulo, i + 1)));
+    } else {
+      if (!cs.length && !viaMarc.length) s.append(h('p', { class: 'vazio' }, 'Nenhuma tela.'));
+      cs.forEach(c => s.append(itemLigacao('→', tela(c.destino), c.texto)));
+      viaMarc.forEach(({ m, i }) => s.append(itemLigacao('→', tela(m.destino), m.titulo, i + 1)));
+    }
+    const ent = entradas(t.id);
+    s.append(h('div', { class: 'sub' }, 'Chegam aqui'));
+    if (!ent.length) s.append(h('p', { class: 'vazio' }, 'Nenhuma tela aponta para esta.'));
+    ent.forEach(e => s.append(itemLigacao('←', e.origem, e.texto, e.num, e.marcador)));
+    return s;
+  }
+
+  function painelEdicao(p, t) {
+    const atualizaCab = () => { $('#cabTitulo').textContent = t.titulo; $('#cabModulo').textContent = t.modulo; renderIndice(); };
+    const dl = h('datalist', { id: 'listaModulos' }, modulos().map(m => h('option', { value: m })));
+    const chk = h('input', { type: 'checkbox', id: `telas-${t.id}-revisada`, checked: !!t.revisada });
+    chk.addEventListener('change', () => {
+      const antes = !!t.revisada; t.revisada = chk.checked; renderIndice();
+      escrever(async () => {
+        await st.db.doc('telas/' + t.id).update({ revisada: chk.checked, atualizadoPor: st.eu, atualizadoEm: agora() });
+        await registrar({ tela: t.id, alvo: 'tela', alvoId: t.id, acao: 'editou', campo: 'revisada', antes, depois: chk.checked });
+      });
+    });
+    const sobre = h('section', { class: 'secao' }, h('h2', {}, 'Sobre a tela'), dl,
+      campo('Módulo (menu)', entrada('telas', t, 'modulo', t.id, { list: 'listaModulos', aoMudar: atualizaCab })),
+      campo('Nome da tela', entrada('telas', t, 'titulo', t.id, { aoMudar: atualizaCab })),
+      campo('O que esta tela significa', entrada('telas', t, 'descricao', t.id, { linhas: 7, placeholder: 'Para que serve, quem usa, quando usar.\nComece a linha com "- " para fazer lista e use **texto** para negrito.' })),
+      campo('Dica do instrutor', entrada('telas', t, 'dica', t.id, { linhas: 3, placeholder: 'Observações para a aula, erros comuns, cuidados.' })),
+      h('label', { class: 'check' }, chk, 'Tela revisada'),
+      assinatura(t));
+    const bts = h('div', { class: 'botoes' });
+    if (st.assets) bts.append(h('button', { onclick: () => $('#inTrocar').click() }, 'Trocar print'));
+    if (st.admin) bts.append(h('button', { class: 'perigo', onclick: excluirTela }, 'Excluir tela'));
+    if (bts.children.length) sobre.append(bts);
+    p.append(sobre);
+
+    const s = h('section', { class: 'secao' }, h('h2', {}, 'Marcadores no print'));
+    const ms = marcadoresDe(t.id);
+    s.append(ms.length ? listaPinos(ms, id => selecionarMarcador(id)) : h('p', { class: 'vazio' }, 'Clique em um ponto do print para marcar um botão, campo ou indicador e explicar o que ele faz.'));
+    const m = st.marc.get(st.marcSel);
+    if (m && m.tela === t.id) {
+      const i = ms.findIndex(x => x.id === m.id);
+      const sel = seletorTela(m.destino, t.id);
+      sel.id = `marcadores-${m.id}-destino`;
+      sel.addEventListener('change', () => {
+        const antes = m.destino; m.destino = sel.value;
+        renderPinos(); renderIndice();
+        escrever(async () => {
+          await st.db.doc('marcadores/' + m.id).update({ destino: sel.value, atualizadoPor: st.eu, atualizadoEm: agora() });
+          await registrar({ tela: t.id, alvo: 'marcador', alvoId: m.id, acao: 'editou', campo: 'destino', antes, depois: sel.value });
+        });
+      });
+      const tit = entrada('marcadores', m, 'titulo', t.id, { placeholder: 'Ex.: Botão Vistoria', aoMudar: v => { const li = $('#painel .lista-pinos li.sel div'); if (li) li.firstChild.textContent = v || 'Sem título'; } });
+      s.append(h('div', { class: 'editor' },
+        h('div', { class: 'cab' }, `Marcador ${i + 1}`),
+        campo('Título (o que é este item)', tit),
+        campo('Explicação', entrada('marcadores', m, 'texto', t.id, { linhas: 4, placeholder: 'O que acontece ao usar este item?' })),
+        campo('Leva para a tela (opcional)', sel),
+        assinatura(m),
+        h('div', { class: 'botoes' },
+          h('button', { onclick: () => { gravarTudo(); st.marcSel = null; marcarSel(); renderPainel(true); } }, 'Concluir'),
+          h('button', { class: 'perigo', onclick: () => excluirMarcador(m) }, 'Excluir marcador'))));
+      if (!m.titulo) setTimeout(() => tit.focus(), 0);
+    }
+    p.append(s, secaoLigacoes(t, true));
+  }
+
+  function excluirMarcador(m) {
+    const copia = { ...m }; delete copia.id;
+    st.marc.delete(m.id); st.marcSel = null;
+    renderPinos(); renderPainel(true); renderIndice();
+    escrever(async () => {
+      await st.db.doc('marcadores/' + m.id).delete();
+      await registrar({ tela: m.tela, alvo: 'marcador', alvoId: m.id, acao: 'excluiu', antes: copia });
+    });
+  }
+  function novaConexao() {
+    const t = atual(), id = uid();
+    const nova = { origem: t.id, destino: '', texto: '', ordem: Date.now(), criadoPor: st.eu, atualizadoPor: st.eu, atualizadoEm: agora() };
+    st.conex.set(id, { id, ...nova });
+    renderPainel(true);
+    setTimeout(() => $(`#conexoes-${id}-destino`)?.focus(), 0);
+    escrever(async () => {
+      await st.db.doc('conexoes/' + id).set(nova);
+      await registrar({ tela: t.id, alvo: 'conexao', alvoId: id, acao: 'criou', depois: nova });
+    });
+  }
+  function removerConexao(c) {
+    const copia = { ...c }; delete copia.id;
+    st.conex.delete(c.id); renderPainel(true);
+    escrever(async () => {
+      await st.db.doc('conexoes/' + c.id).delete();
+      await registrar({ tela: c.origem, alvo: 'conexao', alvoId: c.id, acao: 'excluiu', antes: copia });
+    });
+  }
+  async function excluirTela() {
+    const t = atual();
+    if (!await perguntar(`Excluir a tela "${nomeTela(t)}", com os marcadores e as conexões dela? A exclusão fica no histórico e pode ser desfeita.`, 'Excluir tela')) return;
+    const ms = marcadoresDe(t.id), cs = conexoesDe(t.id);
+    const copia = { tela: { ...t }, marcadores: ms.map(m => ({ ...m })), conexoes: cs.map(c => ({ ...c })) };
+    delete copia.tela.id;
+    const lista = telasOrdenadas(), idx = lista.findIndex(x => x.id === t.id);
+    const prox = lista[idx + 1] || lista[idx - 1];
+    escrever(async () => {
+      for (const m of ms) await st.db.doc('marcadores/' + m.id).delete();
+      for (const c of cs) await st.db.doc('conexoes/' + c.id).delete();
+      await st.db.doc('telas/' + t.id).delete();
+      await registrar({ tela: t.id, alvo: 'tela', alvoId: t.id, acao: 'excluiu', antes: copia });
+    });
+    if (prox) irPara(prox.id);
+  }
+
+  function navegar(d) {
+    const lista = modulos().flatMap(mod => telasOrdenadas().filter(t => t.modulo === mod));
+    const i = lista.findIndex(t => t.id === st.atualId);
+    const p = lista[(i + d + lista.length) % lista.length];
+    if (p) irPara(p.id);
+  }
+
+  /* ---------- Prints ---------- */
+  function reduzir(arquivo) {
+    return new Promise((ok, falha) => {
+      const url = URL.createObjectURL(arquivo), img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        if (img.width <= 1920 && arquivo.size < 3e6) return ok(arquivo);
+        const k = Math.min(1, 1920 / img.width), c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(b => b ? ok(b) : falha(new Error('canvas')), 'image/jpeg', 0.9);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); falha(new Error('imagem')); };
+      img.src = url;
+    });
+  }
+  async function enviarPrint(arquivo) {
+    const blob = await reduzir(arquivo);
+    return await st.assets.upload(blob, { type: blob.type || 'image/jpeg' });
+  }
+  $('#btAdicionar').onclick = () => $('#inPrints').click();
+  $('#inPrints').addEventListener('change', async ev => {
+    const arquivos = [...ev.target.files]; ev.target.value = '';
+    if (!arquivos.length) return;
+    let primeira = null, ordem = Math.max(0, ...[...st.telas.values()].map(t => t.ordem ?? 0));
+    marcarSalvando(1);
+    for (const a of arquivos) {
+      try {
+        const r = await enviarPrint(a);
+        const id = 'tela-' + uid();
+        const nova = { modulo: 'Novas telas', titulo: a.name.replace(/\.[^.]+$/, ''), descricao: '', dica: '', imagem: r.id, ordem: (ordem += 10), revisada: false, atualizadoPor: st.eu, atualizadoEm: agora() };
+        await st.db.doc('telas/' + id).set(nova);
+        await registrar({ tela: id, alvo: 'tela', alvoId: id, acao: 'criou', depois: nova });
+        st.telas.set(id, { id, ...nova });
+        primeira ||= id;
+      } catch (e) { aviso(`Não foi possível enviar ${a.name}: ${e?.message || 'erro'}`); }
+    }
+    marcarSalvando(-1);
+    if (primeira) { irPara(primeira); aviso('Prints adicionados em "Novas telas". Ajuste o módulo e o nome no painel.'); }
+  });
+  $('#inTrocar').addEventListener('change', async ev => {
+    const a = ev.target.files[0]; ev.target.value = '';
+    const t = atual(); if (!a || !t) return;
+    marcarSalvando(1);
+    try {
+      const r = await enviarPrint(a), antes = t.imagem || '';
+      await st.db.doc('telas/' + t.id).update({ imagem: r.id, atualizadoPor: st.eu, atualizadoEm: agora() });
+      await registrar({ tela: t.id, alvo: 'tela', alvoId: t.id, acao: 'editou', campo: 'imagem', antes, depois: r.id });
+      aviso('Print trocado. Confira se os marcadores continuam no lugar certo.');
+    } catch (e) { aviso('Não foi possível trocar o print: ' + (e?.message || 'erro')); }
+    marcarSalvando(-1);
+  });
+
+  /* ---------- Mapa ---------- */
+  function renderMapa() {
+    const svg = $('#mapaSvg'), NS = 'http://www.w3.org/2000/svg';
+    const s = (tag, a = {}) => { const n = document.createElementNS(NS, tag); for (const k in a) n.setAttribute(k, a[k]); return n; };
+    svg.innerHTML = '';
+    const mods = modulos();
+    const COL = 220, NL = 190, NA = 30, G = 8, P = 14, CAB = 26;
+    const cols = Math.max(1, Math.floor(Math.max(440, $('#vistaMapa').clientWidth - 20) / COL));
+    const pos = {}, caixas = [];
+    let y = 20, alt = 0, col = 0;
+    mods.forEach(mod => {
+      const ts = telasOrdenadas().filter(t => t.modulo === mod);
+      const hh = CAB + ts.length * (NA + G) + P - G;
+      if (col >= cols) { col = 0; y += alt + 36; alt = 0; }
+      const x = 20 + col * COL;
+      caixas.push({ mod, x, y, hh });
+      ts.forEach((t, i) => { pos[t.id] = { x: x + P / 2, y: y + CAB + i * (NA + G), t }; });
+      alt = Math.max(alt, hh); col++;
+    });
+    const W = 40 + Math.min(cols, mods.length || 1) * COL, H = y + alt + 40;
+    svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const defs = s('defs');
+    [['setaC', 'seta-cinza'], ['setaL', 'seta-laranja']].forEach(([id, cls]) => {
+      const mk = s('marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
+      mk.append(s('path', { d: 'M0,0 L10,5 L0,10 z', class: cls })); defs.append(mk);
+    });
+    svg.append(defs);
+    caixas.forEach(c => {
+      svg.append(s('rect', { class: 'caixa', x: c.x, y: c.y, width: NL + P, height: c.hh, rx: 6 }));
+      const tx = s('text', { class: 'rotulo', x: c.x + P / 2, y: c.y + 17 }); tx.textContent = c.mod.toUpperCase(); svg.append(tx);
+    });
+    const arestas = [];
+    st.conex.forEach(c => { if (pos[c.origem] && pos[c.destino] && c.origem !== c.destino) arestas.push({ de: c.origem, para: c.destino, tipo: 'tela', texto: c.texto }); });
+    st.marc.forEach(m => { if (pos[m.tela] && pos[m.destino] && m.tela !== m.destino) arestas.push({ de: m.tela, para: m.destino, tipo: 'marc', texto: m.titulo }); });
+    const g = s('g'); svg.append(g);
+    const lig = new Set();
+    arestas.forEach(a => {
+      lig.add(a.de); lig.add(a.para);
+      const A = pos[a.de], B = pos[a.para];
+      const y1 = A.y + NA / 2, y2 = B.y + NA / 2;
+      let d;
+      if (Math.abs(A.x - B.x) < 5) {
+        const x1 = A.x + NL, x2 = B.x + NL, dx = 30 + Math.min(60, Math.abs(y2 - y1) / 4);
+        d = `M${x1},${y1} C${x1 + dx},${y1} ${x2 + dx},${y2} ${x2 + 2},${y2}`;
+      } else {
+        const dir = B.x > A.x, x1 = dir ? A.x + NL : A.x, x2 = dir ? B.x - 2 : B.x + NL + 2;
+        const dx = Math.max(40, Math.abs(x2 - x1) / 3) * (dir ? 1 : -1);
+        d = `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+      }
+      const pth = s('path', { class: 'aresta' + (a.tipo === 'marc' ? ' marc' : ''), d, 'marker-end': `url(#${a.tipo === 'marc' ? 'setaL' : 'setaC'})`, 'data-de': a.de, 'data-para': a.para });
+      const tt = s('title'); tt.textContent = `${nomeTela(tela(a.de))} → ${nomeTela(tela(a.para))}${a.texto ? '\n' + a.texto : ''}`; pth.append(tt);
+      g.append(pth);
+    });
+    Object.values(pos).forEach(({ x, y, t }) => {
+      const n = s('g', { class: 'no' + (lig.has(t.id) ? '' : ' sem'), 'data-id': t.id, tabindex: 0, role: 'link', 'aria-label': nomeTela(t) });
+      n.append(s('rect', { x, y, width: NL, height: NA, rx: 5 }));
+      const tx = s('text', { x: x + 8, y: y + NA / 2 + 4 }); tx.textContent = t.titulo.length > 26 ? t.titulo.slice(0, 25) + '…' : t.titulo; n.append(tx);
+      const tt = s('title'); tt.textContent = nomeTela(t) + (lig.has(t.id) ? '' : '\n(sem conexões)'); n.append(tt);
+      n.addEventListener('click', () => irPara(t.id));
+      n.addEventListener('keydown', e => { if (e.key === 'Enter') irPara(t.id); });
+      n.addEventListener('mouseenter', () => focar(t.id));
+      n.addEventListener('mouseleave', () => focar(null));
+      svg.append(n);
+    });
+    function focar(id) {
+      svg.classList.toggle('focando', !!id);
+      const viz = new Set();
+      if (id) arestas.forEach(a => { if (a.de === id) viz.add(a.para); if (a.para === id) viz.add(a.de); });
+      svg.querySelectorAll('.aresta').forEach(p => p.classList.toggle('foco', !!id && (p.dataset.de === id || p.dataset.para === id)));
+      svg.querySelectorAll('.no').forEach(n => { n.classList.toggle('foco', n.dataset.id === id); n.classList.toggle('viz', viz.has(n.dataset.id)); });
+    }
+  }
+
+  /* ---------- Histórico ---------- */
+  function descrever(r) {
+    const nomeT = nomeTela(tela(r.tela) || r.antes?.tela) ;
+    const ms = r.tela ? marcadoresDe(r.tela) : [];
+    const nM = r.alvo === 'marcador' ? ms.findIndex(m => m.id === r.alvoId) + 1 : 0;
+    const marc = r.alvo === 'marcador' ? (nM ? `o marcador ${nM}` : 'um marcador') : '';
+    if (r.acao === 'criou') return r.alvo === 'tela' ? `adicionou a tela ${nomeT}` : r.alvo === 'marcador' ? `criou ${marc} em ${nomeT}` : `criou uma conexão em ${nomeT}`;
+    if (r.acao === 'excluiu') return r.alvo === 'tela' ? `excluiu a tela ${nomeT}` : r.alvo === 'marcador' ? `excluiu o marcador "${r.antes?.titulo || 'sem título'}" de ${nomeT}` : `removeu uma conexão de ${nomeT}`;
+    if (r.acao === 'desfez') return `desfez uma alteração em ${nomeT}`;
+    const nomes = r.alvo === 'tela' ? CAMPOS_TELA : r.alvo === 'marcador' ? CAMPOS_MARC : CAMPOS_CONEX;
+    const rotulo = r.campo === 'imagem' ? 'o print' : `“${nomes[r.campo] || r.campo}”`;
+    return `alterou ${rotulo}${marc ? ' de ' + marc : ''} em ${nomeT}`;
+  }
+  function valorLegivel(campo, v) {
+    if (campo === 'destino') return v ? nomeTela(tela(v)) : '(nenhuma)';
+    if (campo === 'revisada') return v ? 'Sim' : 'Não';
+    if (campo === 'imagem') return v ? 'print anterior' : '(sem print)';
+    if (v && typeof v === 'object') return v.titulo || v.texto || v.tela?.titulo || '';
+    return v === '' || v == null ? '(vazio)' : String(v);
+  }
+  function renderHist() {
+    const fe = $('#fEstado').value, fp = $('#fPessoa').value, ft = $('#fTela').value;
+    const pessoas = [...new Set(st.hist.map(r => r.autor).filter(Boolean))];
+    const selP = $('#fPessoa'), selT = $('#fTela');
+    selP.innerHTML = ''; selP.append(h('option', { value: '' }, 'Todas as pessoas'), ...pessoas.map(p => h('option', { value: p, selected: p === fp }, nomePessoa(p))));
+    selT.innerHTML = ''; selT.append(h('option', { value: '' }, 'Todas as telas'), ...telasOrdenadas().map(t => h('option', { value: t.id, selected: t.id === ft }, nomeTela(t))));
+    const lista = st.hist.filter(r => (fe === 'todas' || !st.conf.has(r.id)) && (!fp || r.autor === fp) && (!ft || r.tela === ft));
+    const box = $('#histLista'); box.innerHTML = '';
+    $('#btConferirTodas').hidden = !st.admin || fe !== 'pend' || !lista.length;
+    if (!st.carregou) { box.append(h('p', { class: 'carregando' }, 'Carregando o histórico…')); return; }
+    if (!lista.length) {
+      box.append(h('p', { class: 'vazio' }, fe === 'pend' ? 'Nenhuma alteração esperando conferência. Quando alguém editar o manual, a alteração aparece aqui.' : 'Nenhuma alteração registrada ainda.'));
+      return;
+    }
+    for (const r of lista) {
+      const c = st.conf.get(r.id), p = st.perfis[r.autor];
+      const card = h('article', { class: 'registro' + (c ? ' conferido' : '') },
+        h('div', { class: 'linha1' },
+          h('span', { class: 'quem' }, p?.avatarUrl ? h('img', { src: p.avatarUrl, alt: '' }) : null, nomePessoa(r.autor)),
+          h('span', {}, descrever(r)),
+          h('span', { class: 'quando', title: new Date(r.em).toLocaleString('pt-BR') }, quando(r.em)),
+          h('span', { class: 'estado' }, c ? 'Conferida' : 'Não conferida')));
+      if (r.acao === 'editou' && r.campo !== 'imagem') {
+        card.append(h('div', { class: 'diff' },
+          h('div', { class: 'antes' }, h('b', {}, 'Antes'), valorLegivel(r.campo, r.antes)),
+          h('div', { class: 'depois' }, h('b', {}, 'Depois'), valorLegivel(r.campo, r.depois))));
+      } else if (r.acao === 'excluiu' && r.alvo !== 'tela') {
+        card.append(h('div', { class: 'diff' }, h('div', { class: 'antes' }, h('b', {}, 'Excluído'), valorLegivel('', r.antes))));
+      }
+      if (c) card.append(h('div', { class: 'assinatura' }, `Conferida por ${nomePessoa(c.por)}, ${quando(c.em)}`));
+      const bts = h('div', { class: 'botoes' });
+      if (tela(r.tela)) bts.append(h('button', { onclick: () => irPara(r.tela, r.alvo === 'marcador' && st.marc.has(r.alvoId) ? r.alvoId : null) }, 'Abrir a tela'));
+      if (st.admin) {
+        bts.append(h('button', { class: c ? '' : 'prim', onclick: () => conferir(r, !c) }, c ? 'Desmarcar' : 'Marcar como conferida'));
+        if (podeDesfazer(r)) bts.append(h('button', { class: 'perigo', onclick: () => desfazer(r) }, 'Desfazer'));
+      }
+      card.append(bts);
+      box.append(card);
+    }
+  }
+  const podeDesfazer = r => !r.desfeitaEm && ['editou', 'criou', 'excluiu'].includes(r.acao) && !(r.acao === 'criou' && r.alvo === 'tela');
+  function conferir(r, sim) {
+    escrever(() => sim ? st.db.doc('conferencias/' + r.id).set({ por: st.eu, em: agora() }) : st.db.doc('conferencias/' + r.id).delete());
+  }
+  $('#btConferirTodas').onclick = async () => {
+    const fp = $('#fPessoa').value, ft = $('#fTela').value;
+    const lista = st.hist.filter(r => !st.conf.has(r.id) && (!fp || r.autor === fp) && (!ft || r.tela === ft));
+    if (!lista.length || !await perguntar(`Marcar ${lista.length} alteração(ões) como conferida(s)?`, 'Conferir')) return;
+    escrever(async () => { for (const r of lista) await st.db.doc('conferencias/' + r.id).set({ por: st.eu, em: agora() }); });
+  };
+  async function desfazer(r) {
+    if (!await perguntar('Desfazer esta alteração? O manual volta ao valor anterior e o desfazer também fica registrado.', 'Desfazer')) return;
+    const col = r.alvo === 'tela' ? 'telas' : r.alvo === 'marcador' ? 'marcadores' : 'conexoes';
+    escrever(async () => {
+      if (r.acao === 'editou') {
+        const ref = st.db.doc(`${col}/${r.alvoId}`);
+        if (!(await ref.get()).exists) { aviso('O item já foi excluído. Nada para desfazer.'); return; }
+        await ref.update({ [r.campo]: r.antes, atualizadoPor: st.eu, atualizadoEm: agora() });
+      } else if (r.acao === 'criou') {
+        await st.db.doc(`${col}/${r.alvoId}`).delete();
+      } else if (r.acao === 'excluiu') {
+        if (r.alvo === 'tela') {
+          await st.db.doc('telas/' + r.alvoId).set(r.antes.tela);
+          for (const m of r.antes.marcadores || []) { const { id, ...resto } = m; await st.db.doc('marcadores/' + id).set(resto); }
+          for (const c of r.antes.conexoes || []) { const { id, ...resto } = c; await st.db.doc('conexoes/' + id).set(resto); }
+        } else await st.db.doc(`${col}/${r.alvoId}`).set(r.antes);
+      }
+      await st.db.doc('historico/' + r.id).update({ desfeitaEm: agora(), desfeitaPor: st.eu });
+      await registrar({ tela: r.tela, alvo: r.alvo, alvoId: r.alvoId, acao: 'desfez', ref: r.id });
+      await st.db.doc('conferencias/' + r.id).set({ por: st.eu, em: agora() });
+      aviso('Alteração desfeita.');
+    });
+  }
+  ['#fEstado', '#fPessoa', '#fTela'].forEach(s => $(s).addEventListener('change', renderHist));
+
+  /* ---------- Exportar ---------- */
+  $('#btExportar').onclick = async () => {
+    const dados = {
+      exportadoEm: agora(),
+      telas: telasOrdenadas().map(t => ({
+        ...t,
+        marcadores: marcadoresDe(t.id).map((m, i) => ({ numero: i + 1, titulo: m.titulo, texto: m.texto, x: m.x, y: m.y, destino: m.destino })),
+        conexoes: conexoesDe(t.id).map(c => ({ destino: c.destino, texto: c.texto })),
+      })),
+    };
+    try { await st.downloads.save({ filename: `manual-fri-${agora().slice(0, 10)}.json`, data: JSON.stringify(dados, null, 1) }); }
+    catch (e) { if (e?.code !== 'cancelled') aviso('O arquivo não foi salvo.'); }
+  };
+
+  /* ---------- Vistas e modo ---------- */
+  function mostrarVista(v, atualizarHash = true) {
+    st.vista = v;
+    $('#vistaTelas').hidden = v !== 'telas'; $('#vistaMapa').hidden = v !== 'mapa'; $('#vistaHist').hidden = v !== 'historico';
+    $('#btTelas').setAttribute('aria-pressed', v === 'telas'); $('#btMapa').setAttribute('aria-pressed', v === 'mapa'); $('#btHist').setAttribute('aria-pressed', v === 'historico');
+    if (v === 'mapa') renderMapa();
+    if (v === 'historico') renderHist();
+    if (atualizarHash) try { history.replaceState(null, '', '#' + (v === 'telas' ? (st.atualId || '') : v)); } catch (e) {}
+  }
+  function definirModo(m) {
+    if (m === 'editar') gravarTudo();
+    st.modo = m; st.marcSel = null; fecharBalao();
+    $('#btEditar').setAttribute('aria-pressed', m === 'editar'); $('#btApresentar').setAttribute('aria-pressed', m === 'apresentar');
+    renderTela();
+  }
+  $('#btTelas').onclick = () => mostrarVista('telas');
+  $('#btMapa').onclick = () => mostrarVista('mapa');
+  $('#btHist').onclick = () => mostrarVista('historico');
+  $('#btEditar').onclick = () => definirModo('editar');
+  $('#btApresentar').onclick = () => definirModo('apresentar');
+  $('#btAnt').onclick = () => navegar(-1);
+  $('#btProx').onclick = () => navegar(1);
+  $('#busca').addEventListener('input', renderIndice);
+  function zoom() {
+    const z = +$('#zoom').value, q = $('#quadro');
+    fecharBalao();
+    q.classList.toggle('ampliado', z > 1);
+    q.style.width = z > 1 ? ($('#palco').clientWidth - 32) * z + 'px' : '';
+  }
+  $('#zoom').addEventListener('change', zoom);
+  window.addEventListener('resize', () => { if (+$('#zoom').value > 1) zoom(); if (st.vista === 'mapa') renderMapa(); fecharBalao(); });
+  document.addEventListener('keydown', ev => {
+    if (ev.target.closest('input, textarea, select, .dialogo')) return;
+    if (st.vista !== 'telas') return;
+    if (ev.key === 'ArrowLeft') navegar(-1);
+    if (ev.key === 'ArrowRight') navegar(1);
+    if (ev.key === 'Escape') { fecharBalao(); if (st.marcSel) { st.marcSel = null; marcarSel(); renderPainel(true); } }
+  });
+  function lerHash() {
+    const v = decodeURIComponent(location.hash.slice(1));
+    if (v === 'mapa' || v === 'historico') mostrarVista(v, false);
+    else if (tela(v)) { if (v !== st.atualId || st.vista !== 'telas') irPara(v); }
+  }
+  window.addEventListener('hashchange', lerHash);
+
+  /* ---------- Dados ao vivo ---------- */
+  let agendado = false;
+  function aoMudarDados() {
+    if (agendado) return;
+    agendado = true;
+    requestAnimationFrame(async () => {
+      agendado = false;
+      await resolverPerfis([...st.hist.map(r => r.autor), ...[...st.conf.values()].map(c => c.por), ...[...st.telas.values()].map(t => t.atualizadoPor), ...[...st.marc.values()].map(m => m.atualizadoPor), st.eu]);
+      if (!st.atualId || !tela(st.atualId)) {
+        const v = decodeURIComponent(location.hash.slice(1));
+        const primeira = tela(v) ? v : telasOrdenadas()[0]?.id;
+        if (primeira) { st.atualId = primeira; }
+      }
+      renderIndice();
+      if (st.vista === 'telas') {
+        if (st.marcSel && !st.marc.has(st.marcSel)) st.marcSel = null;
+        renderTela();
+      }
+      if (st.vista === 'mapa') renderMapa();
+      if (st.vista === 'historico') renderHist();
+    });
+  }
+  function assinar(colecao, alvo) {
+    let q = st.db.collection(colecao);
+    if (colecao === 'historico') q = q.orderBy('em', 'desc').limit(500);
+    return new Promise(pronto => {
+      q.onSnapshot(snap => {
+        if (Array.isArray(alvo)) { alvo.length = 0; snap.docs.forEach(d => alvo.push({ id: d.id, ...d.data() })); }
+        else {
+          const local = new Map();
+          snap.docs.forEach(d => {
+            // Mantém o que a pessoa está digitando agora, para o eco do banco não apagar letras.
+            const obj = { id: d.id, ...d.data() };
+            for (const [k, r] of rascunhos) { const [c, id, campo] = k.split('/'); if (c === colecao && id === d.id) obj[campo] = r.valor; }
+            local.set(d.id, obj);
+          });
+          alvo.clear(); local.forEach((v, k) => alvo.set(k, v));
+        }
+        pronto(); aoMudarDados();
+      }, e => { console.warn(colecao, e); if (e?.code === 'revoked') mostrarFaixa('Seu acesso a este manual mudou. Recarregue a página.'); pronto(); });
+    });
+  }
+
+  async function iniciar() {
+    renderIndice();
+    const c = window.claude;
+    if (!c?.use) { mostrarFaixa('Abra este manual pelo link do claude.ai para ver e editar as telas.'); st.carregou = true; renderIndice(); renderTela(); return; }
+    const [db, user, assets, downloads] = await Promise.all(['db', 'user', 'assets', 'downloads'].map(n => c.use(n).catch(() => null)));
+    st.db = db; st.user = user; st.assets = assets; st.downloads = downloads;
+    if (!db) { mostrarFaixa('Entre na sua conta do claude.ai para ver e editar o manual.'); st.carregou = true; renderIndice(); renderTela(); return; }
+    if (user) {
+      const me = await user.me();
+      st.eu = me.id; st.dono = me.isOwner; st.admin = me.canEdit || me.isOwner;
+      const pode = await user.can('data.write');
+      st.podeEscrever = pode !== false && !!me.id;
+      if (me.id) $('#eu').append(h('img', { src: me.avatarUrl, alt: '' }), h('span', {}, me.name || 'Você'));
+    }
+    $('#grupoModo').hidden = !st.podeEscrever;
+    $('#btAdicionar').hidden = !st.assets;
+    $('#btExportar').hidden = !st.downloads;
+    if (!st.podeEscrever) { st.modo = 'apresentar'; mostrarFaixa('Você está vendo o manual. Para editar, peça ao dono acesso de Colaborador.'); }
+    await Promise.all([assinar('telas', st.telas), assinar('marcadores', st.marc), assinar('conexoes', st.conex), assinar('historico', st.hist), assinar('conferencias', st.conf)]);
+    st.carregou = true;
+    const v = decodeURIComponent(location.hash.slice(1));
+    if (v === 'mapa' || v === 'historico') { aoMudarDados(); mostrarVista(v, false); }
+    else aoMudarDados();
+    definirModo(st.modo);
+  }
+  iniciar();
+})();
+</script>

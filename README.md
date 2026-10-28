@@ -6,6 +6,16 @@ Sistema web de gestão operacional da **Tóliman Transportes**: motoristas, moni
 >
 > Pontos ainda não confirmados estão listados em [PERGUNTAS.md](PERGUNTAS.md).
 
+## Manual colaborativo (versão compartilhada)
+
+A edição em equipe é feita no **Manual FRI Colaborativo**, uma página publicada no claude.ai. O código dela está em [compartilhado/manual-fri.html](compartilhado/manual-fri.html). As anotações, os prints e o histórico de alterações ficam salvos num banco compartilhado da própria página, e não no navegador de cada pessoa.
+
+- Quem recebe acesso de **Colaborador** edita textos, marcadores e conexões.
+- Quem recebe acesso de **Editor** também adiciona e troca prints.
+- O dono e os Editores conferem cada alteração na aba **Histórico**, podendo marcar como conferida ou desfazer.
+
+O `anotador.html` abaixo continua funcionando, mas salva só no navegador de quem usa.
+
 ## Anotador de telas (para o instrutor)
 
 O arquivo [anotador.html](anotador.html) é uma aplicação para o instrutor anotar os prints do sistema: o que cada tela significa e onde ela se conecta. Abra o arquivo no navegador (Chrome ou Edge) a partir desta pasta, para que os prints de `imagens/` apareçam. As telas já vêm com as descrições deste manual.
