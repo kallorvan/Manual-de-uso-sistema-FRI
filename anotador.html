@@ -327,6 +327,26 @@ const PAGINA_ORIGINAL = document.documentElement.outerHTML;
     });
     return e;
   }
+  // Os prints originais vêm sempre do arquivo atual; o que foi salvo no navegador
+  // guarda só as anotações. Telas novas do arquivo entram no fim do seu módulo.
+  function mesclarComIniciais(e) {
+    const iniciais = new Map(DADOS_INICIAIS.map(t => [t.id, t]));
+    e.telas.forEach(t => {
+      const ini = iniciais.get(t.id);
+      if (!ini || t.imagemPropria) return;
+      t.arquivo = ini.arquivo;
+      if (ini.imagem) t.imagem = ini.imagem; else delete t.imagem;
+    });
+    const existentes = new Set(e.telas.map(t => t.id));
+    DADOS_INICIAIS.forEach((ini, i) => {
+      if (existentes.has(ini.id)) return;
+      const anterior = DADOS_INICIAIS.slice(0, i).reverse().find(x => existentes.has(x.id));
+      const pos = anterior ? e.telas.findIndex(t => t.id === anterior.id) + 1 : 0;
+      e.telas.splice(pos, 0, clone(ini));
+      existentes.add(ini.id);
+    });
+    return e;
+  }
   const tela = id => estado.telas.find(t => t.id === id);
   const atual = () => tela(atualId);
   const nomeTela = t => t ? (t.modulo && t.modulo !== 'Geral' ? `${t.modulo} › ${t.titulo}` : t.titulo) : '(tela removida)';
@@ -820,6 +840,7 @@ const PAGINA_ORIGINAL = document.documentElement.outerHTML;
     if (!a) return;
     try {
       atual().imagem = await lerImagem(a);
+      atual().imagemPropria = true;
       salvar();
       renderTela();
       aviso('Print substituído. Confira a posição dos marcadores.');
@@ -988,7 +1009,7 @@ const PAGINA_ORIGINAL = document.documentElement.outerHTML;
       const novo = JSON.parse(await a.text());
       if (!novo || !Array.isArray(novo.telas)) throw new Error('formato');
       if (!confirm('Substituir as anotações atuais pelas do arquivo?')) return;
-      estado = normalizar(novo);
+      estado = normalizar(mesclarComIniciais(novo));
       salvar();
       abrirTela(estado.telas[0]?.id);
       aviso('Backup carregado.');
@@ -1058,7 +1079,8 @@ const PAGINA_ORIGINAL = document.documentElement.outerHTML;
       document.title = 'Manual Interativo FRI';
       estado = normalizar(window.FRI_DADOS);
     } else {
-      estado = normalizar((await lerDb()) || estadoInicial());
+      const salvo = await lerDb();
+      estado = normalizar(salvo ? mesclarComIniciais(salvo) : estadoInicial());
     }
     const inicial = decodeURIComponent(location.hash.slice(1));
     abrirTela(tela(inicial) ? inicial : estado.telas[0]?.id);
